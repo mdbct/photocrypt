@@ -12,7 +12,7 @@ using namespace cv;
 int main(int argc, char** argv)
 {
     if (argc != 3)
-        throw invalid_argument("Usage: ./steg <image> <text-file>");
+        throw length_error("Usage: ./steg <image> <text-file>");
 
     // Get file names
     string inImageFileName = argv[1];
