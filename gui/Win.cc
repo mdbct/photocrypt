@@ -12,6 +12,7 @@ using Glib::ustring;
 using sigc::mem_fun;
 using sigc::bind;
 using std::string;
+using Gdk::Pixbuf;
 
 /** Default constructor for our main window */
 Win::Win() :
@@ -20,6 +21,8 @@ Win::Win() :
     // Set window parameters
     set_title(PROGRAM_TITLE);
     set_default_icon_from_file("icon.png");
+    set_size_request(300, 100);
+    set_resizable(false);
 
     add(mMainBox);
 
@@ -99,10 +102,13 @@ Win::Win() :
 
 
     // Add a test image
-    mImage.set_size_request(300, 200);
     mMainBox.pack_start(mImage);
 
+    // Add a separator before the "Open" button
+    mMainBox.pack_start( *manage(new Separator()), PACK_SHRINK );
+
     // Add a button to select image to load
+    mButtonSelectImage.set_border_width(10);
     mButtonSelectImage.signal_clicked().connect(mem_fun(*this, &Win::onButtonSelectImageClicked));
     mButtonSelectImage.set_can_default();
     mButtonSelectImage.grab_default();
@@ -159,5 +165,47 @@ void Win::onButtonSelectImageClicked()
     d.add_filter(filterImage);
 
     if (d.run() == RESPONSE_OK)
-        mImage.set(d.get_filename());
+    {
+        auto filename = d.get_filename();
+
+        const auto max_width = 600;
+        const auto max_height = 600;
+
+        auto unscaledImage = Pixbuf::create_from_file(filename);
+
+        double width = unscaledImage -> get_width();
+        double height = unscaledImage -> get_height();
+        double ratio = width / height;
+
+        if (height <= max_height and width <= max_width)
+        {
+            ;
+        }
+        else if (height > max_height and width > max_width)
+        {
+            if (height > width)
+            {
+                height = max_height;
+                width = height * ratio;
+            }
+            else
+            {
+                width = max_width;
+                height = width / ratio;
+            }
+        }
+        else if (height > max_height)
+        {
+            height = max_height;
+            width = height * ratio;
+        }
+        else if (width > max_width)
+        {
+            width = max_width;
+            height = width / ratio;
+        }
+
+        auto scaledImage = unscaledImage -> scale_simple(width, height, Gdk::INTERP_BILINEAR);
+        mImage.set(scaledImage);
+    }
 }
