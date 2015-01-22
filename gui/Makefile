@@ -14,8 +14,8 @@ SOURCES := main.cc Win.cc
 OBJECTS := $(SOURCES:.cc=.o)
 
 CC      := g++
-CFLAGS  := `pkg-config --cflags gtkmm-3.0` -std=c++14 -Wall -O
-LFLAGS  := `pkg-config --libs gtkmm-3.0`
+CFLAGS  := `pkg-config --cflags gtkmm-2.4` -std=c++14 -Wall -O
+LFLAGS  := `pkg-config --libs gtkmm-2.4`
 
 
 

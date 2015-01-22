@@ -1,13 +1,13 @@
 #include "Win.h"
-
-using Glib::RefPtr;
-using Gtk::Application;
+#include <gtkmm/main.h>
 
 int main(int argc, char** argv)
 {
-    RefPtr<Application> app = Application::create(argc, argv, "mdbct.photocrypt");
+    Gtk::Main kit(argc, argv);
 
     Win w;
 
-    return app -> run(w);
+    Gtk::Main::run(w);
+
+    return 0;
 }

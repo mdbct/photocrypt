@@ -21,8 +21,7 @@ Win::Win() :
     // Set window parameters
     set_title(PROGRAM_TITLE);
     set_default_icon_from_file("icon.png");
-    set_size_request(300, 100);
-    set_resizable(false);
+    set_default_size(300, 100);
 
     add(mMainBox);
 
@@ -102,10 +101,15 @@ Win::Win() :
 
 
     // Add a test image
-    mMainBox.pack_start(mImage);
+    mMainBox.pack_start(mImage, PACK_EXPAND_WIDGET);
 
     // Add a separator before the "Open" button
-    mMainBox.pack_start( *manage(new Separator()), PACK_SHRINK );
+    HSeparator mSeparator;
+    mMainBox.pack_start(mSeparator, PACK_SHRINK);
+
+    // Add a status bar:
+    mStatusbar.push(PROGRAM_COPYRIGHT);
+    mMainBox.pack_end(mStatusbar, PACK_SHRINK);
 
     // Add a button to select image to load
     mButtonSelectImage.set_border_width(10);
@@ -130,10 +134,12 @@ void Win::onActionAbout()
     d.set_program_name(PROGRAM_TITLE);
     d.set_version(PROGRAM_VERSION);
     d.set_authors(PROGRAM_AUTHORS);
+    d.set_documenters(PROGRAM_AUTHORS);
     d.set_comments(PROGRAM_DESCRIPTION);
     d.set_website(PROGRAM_WEBSITE);
     d.set_website_label(PROGRAM_WEBSITE_LABEL);
-    d.set_license("GNU GPL v3.0");
+    d.set_license(PROGRAM_LICENSE);
+    d.set_copyright(PROGRAM_COPYRIGHT);
 
     d.run();
 }
@@ -143,7 +149,6 @@ void Win::onAction(const string msg)
     MessageDialog d(msg);
     d.set_transient_for(*this);
     d.set_title("Message");
-    d.set_size_request(150, 10);
     d.run();
 }
 
@@ -152,15 +157,15 @@ void Win::onButtonSelectImageClicked()
     // Create a FileChooseDialog with CANCEL & OK buttons
     FileChooserDialog d(*this, "Select an image");
     d.add_button(Stock::CANCEL, RESPONSE_CANCEL);
-    d.add_button(Stock::OK, RESPONSE_OK);
+    d.add_button(Stock::OPEN, RESPONSE_OK);
 
     // Add filter to select only images
-    auto filterImage = FileFilter::create();
-    filterImage -> set_name("Image files");
-    filterImage -> add_pattern("*.jpg");
-    filterImage -> add_pattern("*.png");
-    filterImage -> add_pattern("*.bmp");
-    filterImage -> add_pattern("*.gif");
+    FileFilter filterImage;
+    filterImage.set_name("Image files");
+    filterImage.add_pattern("*.jpg");
+    filterImage.add_pattern("*.png");
+    filterImage.add_pattern("*.bmp");
+    filterImage.add_pattern("*.gif");
 
     d.add_filter(filterImage);
 
