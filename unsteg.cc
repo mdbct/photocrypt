@@ -1,40 +1,83 @@
 #include <iostream>
-#include <string>
-#include <stdexcept>
-#include <fstream>
+#include <cassert>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include "encrypt.h"
+#include "bit.h"
 
 using namespace std;
 using namespace cv;
 
 int main(int argc, char** argv)
 {
-    if (argc != 2)
-        throw length_error("Usage: ./unsteg <stego-image>");
+    assert(argc == 2);
 
-    // Get the file names
-    string stegoImageFileName = argv[1];
+    // Get the filenames:
+    string imageFilename = argv[1];
 
-    // Load the image
-    Mat stegoImage = imread(stegoImageFileName, CV_LOAD_IMAGE_GRAYSCALE);
-    if (stegoImage.empty())
-        throw runtime_error("Failed to load image.");
+    // Load the image:
+    Mat I = imread(imageFilename, CV_LOAD_IMAGE_COLOR);
+    assert(I.data);
+    
+    int n_rows = I.rows - 1;
+    int n_cols = I.cols * I.channels();
 
-    // Get the size of string from the first three bytes
-    MatIterator_<uchar> it = stegoImage.begin<uchar>();
-    size_t size = 0;
-    for (int i = 0; i < 10; ++i) {
-        size += *it++;
+    // Ask for password
+    string password;
+    cout << "Enter the password: ";
+    cin >> password;
+
+    // Get SHA from image
+    string sha;
+
+    auto p = I.ptr<uchar>(0);
+
+    int i = 0;
+    while (i < (40 * 8))
+    {
+        uchar c;
+
+        for (int j = 0; j < 8; ++j)
+        {
+            set_bit( c, get_bit(p[i], 0), j );
+            ++i;
+        }
+
+        sha.push_back(c);
     }
 
-    // Get the string
+    assert(sha.size() == 40);
+    assert(encrypt(password).compare(sha) == 0);
+
+    // Extract the text
     string text;
-    for (int i = 0; i < size; ++i) {
-        text.push_back(*it);
-        it++;
+
+    MatIterator_<Vec3b> it = I.begin<Vec3b>() + n_cols;
+    while (it != I.end<Vec3b>())
+    {
+        if ( (*it)[0] == 0 )
+            break;
+
+        uchar c;
+        int   k = 0;
+
+        for (int i = 0; i < 3; ++i)
+        {
+            for (int j = 0; j < 3; ++j)
+            {
+                if (i == 2 and j == 2)
+                    continue;
+
+                set_bit( c,  get_bit( (*it)[j], 0), k++ );
+            }
+
+            it++;
+        }
+
+        text.push_back(c);
     }
 
+    cout << "======================= SECRET DATA ==============================" << endl;
     cout << text << endl;
 }

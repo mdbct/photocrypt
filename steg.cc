@@ -1,65 +1,105 @@
 #include <iostream>
+#include <cassert>
+#include <fstream>
+#include <sstream>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <stdexcept>
-#include <string>
-#include <fstream>
+#include "encrypt.h"
+#include "bit.h"
 
 using namespace std;
 using namespace cv;
 
+string to_string(ifstream& in);
+
 int main(int argc, char** argv)
 {
-    if (argc != 3)
-        throw length_error("Usage: ./steg <image> <text-file>");
+    assert(argc == 3);
 
-    // Get file names
-    string inImageFileName = argv[1];
-    string textFileName = argv[2];
+    // Get the file names
+    string imagefile = argv[1];
+    ifstream textfile(argv[2]);
+    string outfile = "out.bmp";
 
-    // Load the image file
-    Mat inImage = imread(inImageFileName, CV_LOAD_IMAGE_GRAYSCALE);
-    if (inImage.empty())
-        throw runtime_error("Failed to load image.");
+    // Load the image
+    Mat I = imread(imagefile, CV_LOAD_IMAGE_COLOR);
+    assert(I.data);
 
-    // Load the text file
-    ifstream textFile(textFileName);
-    if (!textFile)
-        throw runtime_error("Unable to open file: " + textFileName);
+    // Check the size of images
+    assert(I.cols >= 110);
 
-    // Put the contents of text file into a string
-    string  text;
-    char    c;
-    while (textFile.get(c)) text.push_back(c);
-    size_t  size = text.size();
-    if (size >= (10 * 255))
-        throw overflow_error("Too big text file");
+    long n_pixels = I.cols * (I.rows - 1); // available for hiding info
+    long max_size = (3 * n_pixels ) / 8;
 
-    // Put the size of text in first 3 bytes
-    Mat outImage = inImage.clone();
-    MatIterator_<uchar> it = outImage.begin<uchar>();
-    for (int i = 0; i < 10; ++i)
+    // Check the size of textfile
+    string text = to_string(textfile);
+    cout << "max_size = " << max_size << endl;
+    cout << "textsize = " << text.size() << endl;
+    assert(text.size() <= max_size);
+
+    // Ask to provide password
+    string password, sha;
+    cout << "Set a password: ";
+    cin >> password;
+    sha = encrypt(password);
+    assert(sha.size() == 40);
+
+    long n_rows = I.rows - 1;
+    long n_cols = I.cols * I.channels();
+
+    // Set the password in the first row
+    auto p = I.ptr<uchar>(0);
+    int  i = 0;
+    auto iter = sha.begin();
+    while (i < (40 * 8))
     {
-        if (size > 255)
+        uchar c = *iter;
+        for (int j = 0; j < 8; ++j)
         {
-            *it = 255;
-            size -= 255;
+            assert(  set_bit(p[i], get_bit(c, j) )  );
+            ++i;
         }
-        else
-        {
-            *it = size % 256;
-            size = 0;
-        }
-        it++;
+        ++iter;
     }
 
-    // Put the text in rest of pixels
-    copy(text.begin(), text.end(), it);
+    // Fill
+    MatIterator_<Vec3b> it = I.begin<Vec3b>() + n_cols;
+    for (iter = text.begin(); iter != text.end(); iter++)
+    {
+        uchar c = *iter;
+        int   k = 0;
 
-    // Save the output image
-    string outImageFileName = "outImage.bmp";
-    imwrite(outImageFileName, outImage);
+        for (int i = 0; i < 3; ++i)
+        {
+            for (int j = 0; j < 3; ++j)
+            {
+                if (i == 2 and j == 2)
+                    continue;
 
-    cout << "Stego image written to " + outImageFileName << endl;
+                set_bit( (*it)[j], get_bit(c, k++) );
+            }
+
+            if ( (*it)[0] == 0 ) (*it)[0] = 2;
+
+            it++;
+        }
+    }
+
+    (*it)[0] = 0;
+
+    // Should be finished now
+    imwrite(outfile, I);
+    cout << "Stego image written to 'out.bmp'." << endl;
+}
+
+string to_string(ifstream& in)
+{
+    ostringstream out;
+
+    char c;
+    while (in.get(c))
+        out.put(c);
+
+    return out.str();
 }
