@@ -30,13 +30,13 @@ int main(int argc, char** argv)
     assert(I.cols >= 110);
 
     long n_pixels = I.cols * (I.rows - 1); // available for hiding info
-    long max_size = (3 * n_pixels ) / 8;
+    long max_size = n_pixels / 3;
 
     // Check the size of textfile
     string text = to_string(textfile);
-    cout << "max_size = " << max_size << endl;
-    cout << "textsize = " << text.size() << endl;
-    assert(text.size() <= max_size);
+    cout << "Max size: " << max_size    << " Bytes " << endl;
+    cout << "Text size: " << text.size() << " Bytes " << endl;
+    assert(text.size() < max_size);
 
     // Ask to provide password
     string password, sha;
@@ -70,10 +70,12 @@ int main(int argc, char** argv)
         uchar c = *iter;
         int   k = 0;
 
+        // For each byte 'c', go through 3 pixels (each having 3 color values)
         for (int i = 0; i < 3; ++i)
         {
             for (int j = 0; j < 3; ++j)
             {
+                // Ignore the 9th bit
                 if (i == 2 and j == 2)
                     continue;
 

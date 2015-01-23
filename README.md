@@ -23,21 +23,28 @@ The algorithm used in this program can be explained briefly as:
   that it's the end of text.
 
 At the moment, it outputs stego-image named 'out.bmp' by default. So, you have
-to rename and move the file yourself.
+to rename and move the file yourself. Also, the decrypting program outputs the
+hidden text on the `stdout` by default. You can redirect it to a file instead.
 
 
 Requirements
 ------------
 
-- OpenCV 2 C++ library
+- GNU gcc
 - GNU make
-- GNU g++
+- OpenCV 2 C++ library
 - `pkg-config` package
 
 Compilation
 -----------
 
+To build the program:
+
     make
+
+To unbuild:
+
+    make clean
 
 Usage
 -----
@@ -46,6 +53,10 @@ To hide a text file `hello.txt` in an image `image.jpg`:
 
     ./steg image.jpg hello.txt
 
-To view the text hidden in the stego-image `stego.bmp`:
+To view the text hidden in the stego-image `out.bmp`:
 
-    ./unsteg stego.bmp
+    ./unsteg out.bmp
+
+You can save the extracted text in a file by using redirection:
+
+    ./unsteg out.bmp > new_file.txt

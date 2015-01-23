@@ -25,7 +25,7 @@ int main(int argc, char** argv)
 
     // Ask for password
     string password;
-    cout << "Enter the password: ";
+    cerr << "Enter the password: ";
     cin >> password;
 
     // Get SHA from image
@@ -66,6 +66,7 @@ int main(int argc, char** argv)
         {
             for (int j = 0; j < 3; ++j)
             {
+                // Ignore the 9th bit
                 if (i == 2 and j == 2)
                     continue;
 
@@ -78,6 +79,5 @@ int main(int argc, char** argv)
         text.push_back(c);
     }
 
-    cout << "======================= SECRET DATA ==============================" << endl;
     cout << text << endl;
 }
