@@ -28,7 +28,7 @@ to rename and move the file yourself. Also, the decrypting program outputs the
 hidden text on the `stdout` by default. You can redirect it to a file instead.
 
 <blockquote>
-**Note:** You cannot extract text from a JPEG image because the JPEG
+<strong>Note:</strong> You cannot extract text from a JPEG image because the JPEG
 compression algorithm deletes some pixels to reduce file size and quality.
 </blockquote>
 
