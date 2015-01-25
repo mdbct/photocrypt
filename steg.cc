@@ -1,107 +1,44 @@
+/**
+ *  This file is a test program that tests the encryption of data (ie. the
+ *  `steg()` method).
+ *
+ *  Also see the `unsteg.cc` file which tests the decryption part.
+ */
 #include <iostream>
+#include "Image.h"
+#include "TextFile.h"
+#include <string>
 #include <cassert>
-#include <fstream>
-#include <sstream>
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include "encrypt.h"
-#include "bit.h"
 
 using namespace std;
-using namespace cv;
-
-string to_string(ifstream& in);
 
 int main(int argc, char** argv)
 {
+    // Must pass 2 arguments
     assert(argc == 3);
 
-    // Get the file names
-    string imagefile = argv[1];
-    ifstream textfile(argv[2]);
-    string outfile = "out.bmp";
+    // Set the filenames in strings
+    string image_filename = argv[1];
+    string text_filename = argv[2];
+    string stego_filename = "out.png";
+    string key;
 
-    // Load the image
-    Mat I = imread(imagefile, CV_LOAD_IMAGE_COLOR);
-    assert(I.data);
+    // Open the image and the text file
+    Image I = Image::open(image_filename);
+    TextFile file = TextFile::open(text_filename);
 
-    // Check the size of images
-    assert(I.cols >= 110);
+    // Display useful information
+    cout << "Capacity:  " << I.max() << endl;
+    cout << "Text size: " << file.size() << endl;
 
-    long n_pixels = I.cols * (I.rows - 1); // available for hiding info
-    long max_size = n_pixels / 3;
+    // Text size should be less than the maximum capacity of the image
+    assert(file.size() < I.max());
 
-    // Check the size of textfile
-    string text = to_string(textfile);
-    cout << "Max size: " << max_size    << " Bytes " << endl;
-    cout << "Text size: " << text.size() << " Bytes " << endl;
-    assert(text.size() < max_size);
+    // Ask to enter a password
+    cout << "Enter a password: ";
+    cin >> key;
 
-    // Ask to provide password
-    string password, sha;
-    cout << "Set a password: ";
-    cin >> password;
-    sha = encrypt(password);
-    assert(sha.size() == 40);
-
-    long n_rows = I.rows - 1;
-    long n_cols = I.cols * I.channels();
-
-    // Set the password in the first row
-    auto p = I.ptr<uchar>(0);
-    int  i = 0;
-    auto iter = sha.begin();
-    while (i < (40 * 8))
-    {
-        uchar c = *iter;
-        for (int j = 0; j < 8; ++j)
-        {
-            assert(  set_bit(p[i], get_bit(c, j) )  );
-            ++i;
-        }
-        ++iter;
-    }
-
-    // Fill
-    MatIterator_<Vec3b> it = I.begin<Vec3b>() + n_cols;
-    for (iter = text.begin(); iter != text.end(); iter++)
-    {
-        uchar c = *iter;
-        int   k = 0;
-
-        // For each byte 'c', go through 3 pixels (each having 3 color values)
-        for (int i = 0; i < 3; ++i)
-        {
-            for (int j = 0; j < 3; ++j)
-            {
-                // Ignore the 9th bit
-                if (i == 2 and j == 2)
-                    continue;
-
-                set_bit( (*it)[j], get_bit(c, k++) );
-            }
-
-            if ( (*it)[0] == 0 ) (*it)[0] = 2;
-
-            it++;
-        }
-    }
-
-    (*it)[0] = 0;
-
-    // Should be finished now
-    imwrite(outfile, I);
-    cout << "Stego image written to 'out.bmp'." << endl;
-}
-
-string to_string(ifstream& in)
-{
-    ostringstream out;
-
-    char c;
-    while (in.get(c))
-        out.put(c);
-
-    return out.str();
+    // Steg the shit
+    I.steg(file.str(), key).save(stego_filename);
+    cout << "Stego image written to " + stego_filename << endl;
 }

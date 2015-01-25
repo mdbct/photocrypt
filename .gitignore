@@ -28,3 +28,6 @@
 *.app
 steg
 unsteg
+
+# Documentation
+doc/*
