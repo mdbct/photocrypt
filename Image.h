@@ -1,4 +1,4 @@
-/** 
+/** @file
  *  This file contains the declaration of the `Image` class that represents
  *  an image.
  *

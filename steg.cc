@@ -1,4 +1,4 @@
-/**
+/** @file
  *  This file is a test program that tests the encryption of data (ie. the
  *  `steg()` method).
  *

@@ -1,4 +1,4 @@
-/**
+/** @file
  *  This file contains the definitions of the `Image` class.
  *
  *  The `Image` class was declared in `Image.h`.

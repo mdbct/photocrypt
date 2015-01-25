@@ -1,4 +1,4 @@
-/**
+/** @file
  *  This file defines the utlity function declared in `util.h` file.
  */
 #include "util.h"

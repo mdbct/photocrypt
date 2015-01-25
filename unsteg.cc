@@ -1,4 +1,4 @@
-/** 
+/** @file
  *  This file is a simple test program that tests the decryption of data
  *  from a stego-image. (ie. it tests the `unsteg()` method.)
  *

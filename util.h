@@ -1,4 +1,4 @@
-/**
+/** @file
  *  This file contains the decarations of the useful utility functions.
  */
 #ifndef UTIL_H
