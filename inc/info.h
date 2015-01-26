@@ -1,5 +1,5 @@
-/**
- * Some global informations about the program.
+/** @file
+ *  Some global informations about the program.
  */
 #include <vector>
 #include <gtkmm.h>

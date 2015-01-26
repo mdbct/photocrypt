@@ -5,7 +5,7 @@
  *  Also see the `unsteg.cc` file which tests the decryption part.
  */
 #include <iostream>
-#include "Image.h"
+#include "MatImage.h"
 #include "TextFile.h"
 #include <string>
 #include <cassert>
@@ -24,7 +24,7 @@ int main(int argc, char** argv)
     string key;
 
     // Open the image and the text file
-    Image I = Image::open(image_filename);
+    MatImage I = image_filename;
     TextFile file = TextFile::open(text_filename);
 
     // Display useful information

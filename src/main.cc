@@ -1,5 +1,9 @@
+#include <iostream>
+#include <gtkmm.h>
+#include "MatImage.h"
 #include "Win.h"
-#include <gtkmm/main.h>
+
+using namespace std;
 
 int main(int argc, char** argv)
 {

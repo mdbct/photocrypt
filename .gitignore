@@ -28,6 +28,7 @@
 *.app
 steg
 unsteg
+gui
 
 # Documentation
-doc/*
+doc/

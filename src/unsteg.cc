@@ -6,7 +6,7 @@
  */
 #include <iostream>
 #include <string>
-#include "Image.h"
+#include "MatImage.h"
 #include <cassert>
 
 using namespace std;
@@ -21,7 +21,7 @@ int main(int argc, char** argv)
     string key;
 
     // Open the stego-image
-    Image I = Image::open(stego_filename);
+    MatImage I = stego_filename;
 
     // Ask for password:
     cerr << "Enter password: ";

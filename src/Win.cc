@@ -1,10 +1,12 @@
-/**
- * The implementation (definition) of the class `Win`.
+/** @file
+ *  This file defines the `Win` class
  */
 #include "Win.h"
 #include "info.h"
 #include <iostream>
 #include <string>
+#include "MatImage.h"
+#include "TextFile.h"
 
 using namespace Gtk;
 using Glib::RefPtr;
@@ -14,14 +16,14 @@ using sigc::bind;
 using std::string;
 using Gdk::Pixbuf;
 
-/** Default constructor for our main window */
+// Default constructor for our main window
 Win::Win() :
-    mButtonSelectImage("Open Image...")
+    mButtonSelectImage("Select Image...")
 {
     // Set window parameters
     set_title(PROGRAM_TITLE);
     set_default_icon_from_file("icon.png");
-    set_default_size(300, 100);
+    set_default_size(600, 400);
 
     add(mMainBox);
 
@@ -122,7 +124,7 @@ Win::Win() :
 }
 
 
-/** Destructor */
+// Destructor
 Win::~Win() {}
 
 
@@ -171,46 +173,13 @@ void Win::onButtonSelectImageClicked()
 
     if (d.run() == RESPONSE_OK)
     {
-        auto filename = d.get_filename();
+        string filename = d.get_filename();       
 
-        const auto max_width = 600;
-        const auto max_height = 600;
+        MatImage I = filename;
 
-        auto unscaledImage = Pixbuf::create_from_file(filename);
+        int w, h;
+        this -> get_size(w, h);
 
-        double width = unscaledImage -> get_width();
-        double height = unscaledImage -> get_height();
-        double ratio = width / height;
-
-        if (height <= max_height and width <= max_width)
-        {
-            ;
-        }
-        else if (height > max_height and width > max_width)
-        {
-            if (height > width)
-            {
-                height = max_height;
-                width = height * ratio;
-            }
-            else
-            {
-                width = max_width;
-                height = width / ratio;
-            }
-        }
-        else if (height > max_height)
-        {
-            height = max_height;
-            width = height * ratio;
-        }
-        else if (width > max_width)
-        {
-            width = max_width;
-            height = width / ratio;
-        }
-
-        auto scaledImage = unscaledImage -> scale_simple(width, height, Gdk::INTERP_BILINEAR);
-        mImage.set(scaledImage);
+        mImage.set(I.fit(w, h));
     }
 }

@@ -1,7 +1,8 @@
 photocrypt
 ==========
 
-A steganography program that hides text in images.
+A [steganography](http://en.wikipedia.org/wiki/Steganography) program that
+hides text in images.
 
 It implements the Least Significant Bit (LSB) algorithm with SHA1 password
 protection. Every bit of secret data is stored in the LSBs of the image pixel
@@ -23,23 +24,28 @@ The algorithm used in this program can be explained briefly as:
   text, its 2nd LSB is set to 1, to prevent the decoding algorithm to think
   that it's the end of text.
 
-At the moment, it outputs stego-image named 'out.png' by default. So, you have
+At the moment, it outputs stego-image named `out.png` by default. So, you have
 to rename and move the file yourself. Also, the decrypting program outputs the
 hidden text on the `stdout` by default. You can redirect it to a file instead.
 
 <blockquote>
-<strong>Note:</strong> You cannot extract text from a JPEG image because the JPEG
-compression algorithm deletes some pixels to reduce file size and quality.
+<strong>Note:</strong> You cannot extract text from a JPEG image because the
+JPEG compression algorithm deletes some pixels to reduce file size and quality.
 </blockquote>
+
+We are also developing a simple graphical frontend for the program using the
+<em>[gtkmm](http://gtkmm.org)</em> library.
 
 
 Requirements
 ------------
 
-- GNU gcc
-- GNU make
-- OpenCV 2 C++ library
-- `pkg-config` package
+- [GNU gcc](http://gcc.gnu.org)
+- [GNU make](http://www.gnu.org/software/make)
+- [pkg-config](http://pkgconfig.freedesktop.org/wiki/) package
+- [OpenCV 2](http://opencv.org) library
+- <em>[gtkmm](http://gtkmm.org)</em> library
+- [OpenSSL](http://openssl.org) library
 
 Compilation
 -----------
@@ -70,3 +76,7 @@ To view the text hidden in the stego-image `out.bmp`:
 You can save the extracted text in a file by using redirection:
 
     ./unsteg out.png > new_file.txt
+
+To run the test GUI application:
+
+    ./gui
