@@ -71,7 +71,7 @@ To open the GUI frontend, run:
 
     ./photocrypt
 
-Or if you are a terminal-lover like me, here's you can hide a text file
+Or if you are a terminal-lover like me, here's how you can hide a text file
 `secret.txt` in an image `image.jpg`:
 
     ./steg image.jpg secret.txt
