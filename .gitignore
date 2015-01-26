@@ -28,7 +28,7 @@
 *.app
 steg
 unsteg
-gui
+photocrypt
 
 # Documentation
 doc/

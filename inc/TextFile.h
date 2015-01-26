@@ -32,6 +32,9 @@ class TextFile
         /** Returns the contents of the text file as a `std::string` object */
         std::string str() const;
 
+        /** Convert into std::string */
+        operator std::string() const;
+
         /** Overloads the `<<` operator to be used for I/O */
         friend std::ostream& operator<<(std::ostream&, const TextFile&);
 

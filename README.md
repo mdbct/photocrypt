@@ -2,7 +2,8 @@ photocrypt
 ==========
 
 A [steganography](http://en.wikipedia.org/wiki/Steganography) program that
-hides text in images.
+hides text in images. It has both a graphical ([gtkmm](http://gtkmm.org))
+and a command-line interface. It is written in C++.
 
 It implements the Least Significant Bit (LSB) algorithm with SHA1 password
 protection. Every bit of secret data is stored in the LSBs of the image pixel
@@ -24,17 +25,13 @@ The algorithm used in this program can be explained briefly as:
   text, its 2nd LSB is set to 1, to prevent the decoding algorithm to think
   that it's the end of text.
 
-At the moment, it outputs stego-image named `out.png` by default. So, you have
-to rename and move the file yourself. Also, the decrypting program outputs the
-hidden text on the `stdout` by default. You can redirect it to a file instead.
-
 <blockquote>
 <strong>Note:</strong> You cannot extract text from a JPEG image because the
 JPEG compression algorithm deletes some pixels to reduce file size and quality.
 </blockquote>
 
-We are also developing a simple graphical frontend for the program using the
-<em>[gtkmm](http://gtkmm.org)</em> library.
+The CLI programs writes the stego-image in `out.png` file in the current
+directory, and writes the hidden text in `stdout`.
 
 
 Requirements
@@ -44,39 +41,42 @@ Requirements
 - [GNU make](http://www.gnu.org/software/make)
 - [pkg-config](http://pkgconfig.freedesktop.org/wiki/) package
 - [OpenCV 2](http://opencv.org) library
-- <em>[gtkmm](http://gtkmm.org)</em> library
+- <em>[gtkmm 2.4](http://gtkmm.org)</em> library
 - [OpenSSL](http://openssl.org) library
 
 Compilation
 -----------
 
-To build the program:
+To build the GUI program:
 
     make
 
-To unbuild:
+To build the CLI program:
+
+    make cli
+
+To clean:
 
     make clean
 
-For help on available make targets:
+To list available `make` targets:
 
     make help
+
 
 Usage
 -----
 
-To hide a text file `hello.txt` in an image `image.jpg`:
+To open the GUI frontend, run:
 
-    ./steg image.jpg hello.txt
+    ./photocrypt
 
-To view the text hidden in the stego-image `out.bmp`:
+Or if you are a terminal-lover like me, here's you can hide a text file
+`secret.txt` in an image `image.jpg`:
 
-    ./unsteg out.png
+    ./steg image.jpg secret.txt
 
-You can save the extracted text in a file by using redirection:
+Similarly, to view the text hidden in a stego-image `stego.png`:
 
-    ./unsteg out.png > new_file.txt
+    ./unsteg stego.png
 
-To run the test GUI application:
-
-    ./gui

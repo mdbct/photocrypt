@@ -78,6 +78,7 @@ short MatImage::channels() const { return  mMat.channels(); }
 short MatImage::bps() const { return  sizeof(*mMat.data) * 8; }
 byte* MatImage::data() const { return  mMat.data; }
 long MatImage::max() const { return (cols() * (rows() - 1)) / 8; }
+bool MatImage::empty() const { return mMat.empty(); }
 
 
 // Convert to a Pixbuf

@@ -7,6 +7,7 @@
 #include <string>
 #include "MatImage.h"
 #include "TextFile.h"
+#include "util.h"
 
 using namespace Gtk;
 using Glib::RefPtr;
@@ -14,47 +15,63 @@ using Glib::ustring;
 using sigc::mem_fun;
 using sigc::bind;
 using std::string;
+using std::to_string;
 using Gdk::Pixbuf;
 
 // Default constructor for our main window
 Win::Win() :
-    mButtonSelectImage("Select Image...")
+    mLabelKey("Enter password"),
+    mLabelImage("Select an image"),
+    mLabelText("Write message or open a file"),
+    mSized(false),
+    mButtonSave("Save Text"),
+    mButtonOpenImage("Open an Image"),
+    mButtonOpenText("Open a Text File")
 {
     // Set window parameters
     set_title(PROGRAM_TITLE);
     set_default_icon_from_file("icon.png");
-    set_default_size(600, 400);
 
-    add(mMainBox);
+    add(mVBoxMain);
 
     // Create and fill the action group
     mrActionGroup = ActionGroup::create();
 
+    // Menus
     mrActionGroup -> add( Action::create("ActionFile", "_File") );
     mrActionGroup -> add( Action::create("ActionEdit", "_Edit") );
+    mrActionGroup -> add( Action::create("ActionMode", "_Mode") );
     mrActionGroup -> add( Action::create("ActionHelp", "_Help") );
 
-    mrActionGroup -> add( Action::create("ActionNew", Stock::NEW),
-            bind(mem_fun(*this, &Win::onAction), "New") );
-    mrActionGroup -> add( Action::create("ActionOpen", Stock::OPEN),
-            mem_fun(*this, &Win::onButtonSelectImageClicked) );
-    mrActionGroup -> add( Action::create("ActionSave", Stock::SAVE),
-            bind(mem_fun(*this, &Win::onAction), "Save") );
-    mrActionGroup -> add( Action::create("ActionSaveAs", Stock::SAVE_AS),
-            AccelKey("<shift><control>s"),
-            bind(mem_fun(*this, &Win::onAction), "Save As") );
+    // FileMenu
+    mrActionGroup -> add( Action::create("ActionOpenImage", "Open _Image"),
+            mem_fun(*this, &Win::onOpenImage) );
+    mrActionGroup -> add( Action::create("ActionOpenText", "Open _Text File"),
+            mem_fun(*this, &Win::onOpenText) );
     mrActionGroup -> add( Action::create("ActionClose", Stock::CLOSE),
             mem_fun(*this, &Win::close) );
     mrActionGroup -> add( Action::create("ActionQuit", Stock::QUIT),
             mem_fun(*this, &Win::close) );
+
+    // EditMenu
     mrActionGroup -> add( Action::create("ActionCut", Stock::CUT),
             bind(mem_fun(*this, &Win::onAction), "Cut") );
     mrActionGroup -> add( Action::create("ActionCopy", Stock::COPY),
             bind(mem_fun(*this, &Win::onAction), "Copy") );
     mrActionGroup -> add( Action::create("ActionPaste", Stock::PASTE),
             bind(mem_fun(*this, &Win::onAction), "Paste") );
+
+    // ModeMenu
+    RadioAction::Group groupMode;
+    mrActionGroup -> add( RadioAction::create(groupMode, "ActionModeSteg", "Steg"),
+            AccelKey("<control>1"),
+            mem_fun(*this, &Win::onModeSteg) );
+    mrActionGroup -> add( RadioAction::create(groupMode, "ActionModeUnsteg", "Unsteg"),
+            AccelKey("<control>2"),
+            mem_fun(*this, &Win::onModeUnsteg) );
+
+    // HelpMenu
     mrActionGroup -> add( Action::create("ActionAbout", Stock::ABOUT),
-            AccelKey("F1"),
             mem_fun(*this, &Win::onActionAbout) );
 
     // Create the UIManager and add the ActionGroup to it:
@@ -67,10 +84,8 @@ Win::Win() :
         "<ui>"
         "   <menubar name='MenuBar'>"
         "       <menu action='ActionFile'>"
-        "           <menuitem action='ActionNew' />"
-        "           <menuitem action='ActionOpen' />"
-        "           <menuitem action='ActionSave' />"
-        "           <menuitem action='ActionSaveAs' />"
+        "           <menuitem action='ActionOpenImage' />"
+        "           <menuitem action='ActionOpenText' />"
         "           <separator />"
         "           <menuitem action='ActionClose' />"
         "           <menuitem action='ActionQuit' />"
@@ -80,46 +95,102 @@ Win::Win() :
         "           <menuitem action='ActionCopy' />"
         "           <menuitem action='ActionPaste' />"
         "       </menu>"
+        "       <menu action='ActionMode'>"
+        "           <menuitem action='ActionModeSteg' />"
+        "           <menuitem action='ActionModeUnsteg' />"
+        "       </menu>"
         "       <menu action='ActionHelp'>"
         "           <menuitem action='ActionAbout' />"
         "       </menu>"
         "   </menubar>"
-        "   <toolbar name='Toolbar'>"
-        "       <toolitem action='ActionNew' />"
-        "       <toolitem action='ActionOpen' />"
-        "       <toolitem action='ActionSave' />"
-        "       <toolitem action='ActionQuit' />"
-        "       <toolitem action='ActionAbout' />"
-        "   </toolbar>"
+        //"   <toolbar name='Toolbar'>"
+        //"       <toolitem action='ActionOpenImage' />"
+        //"       <toolitem action='ActionOpenText' />"
+        //"       <toolitem action='ActionQuit' />"
+        //"       <toolitem action='ActionAbout' />"
+        //"   </toolbar>"
         "</ui>";
     mrUIManager -> add_ui_from_string(toolbar_layout);
 
-    // Add the MenuBar and Toolbar
+    // Add the MenuBar and Toolbar:
     Widget* pMenuBar = mrUIManager -> get_widget("/MenuBar");
-    Widget* pToolbar = mrUIManager -> get_widget("/Toolbar");
+    //Widget* pToolbar = mrUIManager -> get_widget("/Toolbar");
 
-    mMainBox.pack_start(*pMenuBar, PACK_SHRINK);
-    mMainBox.pack_start(*pToolbar, PACK_SHRINK);
+    // Fill mVBoxMain:
+    mVBoxMain.pack_start(*pMenuBar, PACK_SHRINK);
+    //mVBoxMain.pack_start(*pToolbar, PACK_SHRINK);
+    mVBoxMain.pack_start(mHBoxMain);
+    mVBoxMain.pack_start(mStatusbar, PACK_SHRINK);
+    mStatusbar.push("Photocrypt 1.0 (C) 2015. MDBCT");
 
+    // Fill mHBoxMain:
+    mHBoxMain.set_spacing(0);
+    mHBoxMain.pack_start(mVBoxImage);
+    mHBoxMain.pack_start(mVSep, PACK_SHRINK);
+    mHBoxMain.pack_start(mVBoxText);
 
-    // Add a test image
-    mMainBox.pack_start(mImage, PACK_EXPAND_WIDGET);
+    // Fill mVBoxImage
+    mVBoxImage.set_border_width(10);
+    mVBoxImage.set_spacing(10);
+    mVBoxImage.pack_start(mHBoxImage, PACK_SHRINK);
+    mVBoxImage.pack_start(mFrameImage, PACK_EXPAND_WIDGET);
 
-    // Add a separator before the "Open" button
-    HSeparator mSeparator;
-    mMainBox.pack_start(mSeparator, PACK_SHRINK);
+    // Fill mHBoxImage
+    mHBoxImage.pack_start(mButtonOpenImage, PACK_SHRINK);
+    mHBoxImage.pack_end(mLabelImage, PACK_SHRINK);
 
-    // Add a status bar:
-    mStatusbar.push(PROGRAM_COPYRIGHT);
-    mMainBox.pack_end(mStatusbar, PACK_SHRINK);
+    // Fill mFrameImage
+    mFrameImage.set_size_request(400, 400);
+    mFrameImage.set(ALIGN_CENTER, ALIGN_CENTER, 1);
+    mFrameImage.add(mImage);
 
-    // Add a button to select image to load
-    mButtonSelectImage.set_border_width(10);
-    mButtonSelectImage.signal_clicked().connect(mem_fun(*this, &Win::onButtonSelectImageClicked));
-    mButtonSelectImage.set_can_default();
-    mButtonSelectImage.grab_default();
-    mMainBox.pack_end(mButtonSelectImage, PACK_SHRINK);
+    // Fill mVBoxText
+    mVBoxText.set_border_width(10);
+    mVBoxText.set_spacing(10);
+    mVBoxText.pack_start(mHBoxText, PACK_SHRINK);
+    mVBoxText.pack_start(mScrolledWindowText);
+    mVBoxText.pack_start(mHBoxKey, PACK_SHRINK);
+    mVBoxText.pack_start(mHSep, PACK_SHRINK);
+    mVBoxText.pack_start(mHBoxSave, PACK_SHRINK);
 
+    // Fill mHBoxText
+    mHBoxText.pack_start(mButtonOpenText, PACK_SHRINK);
+    mHBoxText.pack_end(mLabelText, PACK_SHRINK);
+
+    // Fill mScrolledWindow
+    mrTextBuffer = mTextView.get_buffer();
+    mrTextBuffer -> signal_changed().connect(mem_fun(*this, &Win::onTextBufferChange));
+    mScrolledWindowText.add(mTextView);
+
+    // Fill mHBoxKey
+    mHBoxKey.set_spacing(10);
+    mHBoxKey.pack_start(mLabelKey, PACK_SHRINK);
+    mHBoxKey.pack_start(mEntryKey);
+
+    // Fill mHBoxSave
+    mHBoxSave.set_spacing(10);
+    mHBoxSave.set_size_request(400, 40);
+    mHBoxSave.pack_start(mButtonSteg);
+    mHBoxSave.pack_start(mButtonSave);
+
+    // Widgets in the left side
+    mButtonOpenImage.signal_clicked().connect(mem_fun(*this, &Win::onOpenImage));
+
+    mImage.signal_size_allocate().connect(mem_fun(*this, &Win::onImageResize));
+
+    // Widgets in the right side
+    mButtonOpenText.signal_clicked().connect(mem_fun(*this, &Win::onOpenText));
+
+    mScrolledWindowText.set_policy(POLICY_AUTOMATIC, POLICY_AUTOMATIC);
+
+    mEntryKey.set_visibility(false);
+
+    mButtonSteg.set_can_default();
+    mButtonSteg.grab_default();
+
+    mButtonSave.signal_clicked().connect(mem_fun(*this, &Win::save));
+
+    onModeSteg();
     show_all_children();
 }
 
@@ -154,7 +225,7 @@ void Win::onAction(const string msg)
     d.run();
 }
 
-void Win::onButtonSelectImageClicked()
+void Win::onOpenImage()
 {
     // Create a FileChooseDialog with CANCEL & OK buttons
     FileChooserDialog d(*this, "Select an image");
@@ -173,13 +244,184 @@ void Win::onButtonSelectImageClicked()
 
     if (d.run() == RESPONSE_OK)
     {
-        string filename = d.get_filename();       
+        string filename = d.get_filename();
+        mMatImage = filename;
+        mImage.set(mMatImage.fit(mImage.get_width(), mImage.get_height()));
+        string label = "Capacity: " + to_string(mMatImage.max()) + " Bytes";
+        mLabelImage.set_label(label);
+    }
+}
 
-        MatImage I = filename;
+void Win::onOpenText()
+{
+    FileChooserDialog d(*this, "Select a text file");
+    d.add_button(Stock::CANCEL, RESPONSE_CANCEL);
+    d.add_button(Stock::OPEN, RESPONSE_OK);
 
-        int w, h;
-        this -> get_size(w, h);
+    FileFilter filterText;
+    filterText.set_name("ASCII Text Files");
+    filterText.add_mime_type("text/plain");
+    d.add_filter(filterText);
 
-        mImage.set(I.fit(w, h));
+    if (d.run() == RESPONSE_OK)
+    {
+        string filename = d.get_filename();
+        mTextFile = TextFile::open(filename);
+        mrTextBuffer -> set_text(mTextFile.str());
+    }
+}
+
+void Win::onImageResize(Allocation& a)
+{
+    if (mMatImage.empty())
+        return;
+
+    if (not mSized) {
+        mImage.set(mMatImage.fit(a.get_width(), a.get_height()));
+        mSized = true;
+    } else {
+        mSized = false;
+    }
+}
+
+void Win::onModeSteg()
+{
+    mButtonSteg.set_label("Steg");
+    mConnection.disconnect();
+    mConnection = mButtonSteg.signal_clicked().connect(mem_fun(*this, &Win::steg));
+    mLabelKey.set_label("Set a password");
+
+    mButtonSave.set_sensitive(false);
+    mButtonOpenText.set_sensitive(true);
+    mTextView.set_sensitive(true);
+    mEntryKey.set_text("");
+}
+
+void Win::onModeUnsteg()
+{
+    mButtonSteg.set_label("Unsteg");
+    mConnection.disconnect();
+    mConnection = mButtonSteg.signal_clicked().connect(mem_fun(*this, &Win::unsteg));
+    mLabelKey.set_label("Enter the password");
+
+    mrTextBuffer -> set_text("");
+    mTextView.set_sensitive(false);
+    mButtonSave.set_sensitive(false);
+    mButtonOpenText.set_sensitive(false);
+    mEntryKey.set_text("");
+}
+
+void Win::steg()
+{
+    TextFile t = (mrTextBuffer->get_text()).raw();
+
+    if (mMatImage.empty()) {
+        MessageDialog(*this,
+                "Please select an image first.", false,
+                MESSAGE_ERROR).run();
+        return;
+    }
+
+    if (t.size() == 0) {
+        MessageDialog(*this,
+                "You must enter a message or open a text file.", false,
+                MESSAGE_ERROR).run();
+        return;
+    }
+
+    string key = mEntryKey.get_text().raw();
+    if (key.empty()) {
+        MessageDialog(*this,
+                "You must set a password.", false,
+                MESSAGE_ERROR).run();
+        return;
+    }
+
+    if (t.size() >= mMatImage.max()) {
+        MessageDialog(*this,
+                "Text size has exceeded image capacity.", false,
+                MESSAGE_ERROR).run();
+        return;
+    }
+
+    FileChooserDialog d(*this, "Save stego image as...", FILE_CHOOSER_ACTION_SAVE);
+    d.add_button(Stock::CANCEL, RESPONSE_CANCEL);
+    d.add_button(Stock::SAVE, RESPONSE_OK);
+
+    FileFilter filterImage;
+    filterImage.set_name("BMP or PNG Images");
+    filterImage.add_pattern("*.bmp");
+    filterImage.add_pattern("*.png");
+    d.add_filter(filterImage);
+
+    if (d.run() == RESPONSE_OK) {
+        string filename = d.get_filename().raw();
+        mMatImage.steg(t.str(), key).save(filename);
+        mStatusbar.pop();
+        mStatusbar.push("Stego-image written successfully.");
+        mEntryKey.set_text("");
+    }
+}
+
+void Win::unsteg()
+{
+    if (mMatImage.empty()) {
+        MessageDialog(*this,
+                "Select a image file first.", false,
+                MESSAGE_ERROR).run();
+        return;
+    }
+
+    if (mMatImage.hash().size() != 40) {
+        MessageDialog(*this,
+                "The image is not a stego-image", false,
+                MESSAGE_ERROR).run();
+        return;
+    }
+
+    string key = mEntryKey.get_text().raw();
+    if (util::sha(key) != mMatImage.hash()) {
+        MessageDialog(*this,
+                "Incorrect password.", false,
+                MESSAGE_ERROR).run();
+        return;
+    }
+
+    string text = mMatImage.reveal();
+    mrTextBuffer -> set_text(text);
+
+    mTextView.set_sensitive(true);
+    mButtonSave.set_sensitive(true);
+
+    mStatusbar.pop();
+    mStatusbar.push("Hidden text successfully encoded.");
+}
+
+void Win::onTextBufferChange()
+{
+    int size = (mrTextBuffer -> get_text()).size();
+    string label = "Size: " + to_string(size) + " Bytes";
+    mLabelText.set_label(label);
+}
+
+void Win::save()
+{
+    FileChooserDialog d(*this, "Save text as...", FILE_CHOOSER_ACTION_SAVE);
+    d.add_button(Stock::CANCEL, RESPONSE_CANCEL);
+    d.add_button(Stock::SAVE, RESPONSE_OK);
+
+    FileFilter filter;
+    filter.set_name("ASCII Text Files");
+    filter.add_mime_type("text/plain");
+    d.add_filter(filter);
+
+    if (d.run() == RESPONSE_OK) {
+        string filename = d.get_filename().raw();
+        TextFile t = (mrTextBuffer -> get_text()).raw();
+        t.save(filename);
+
+        mStatusbar.pop();
+        mStatusbar.push("Text file saved successfully.");
+        mEntryKey.set_text("");
     }
 }

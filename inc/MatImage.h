@@ -51,6 +51,7 @@ class MatImage
         short bps() const;  ///< Returns the number of bits per sample
         uint8_t* data() const;  ///< Returns the pointer to the pixel array
         long max() const;   ///< Returns the maximum size of text this image can hide
+        bool empty() const; ///< Checks if image is empty
 
         /** Returns a Pixbuf object to be used in gtkmm */
         Glib::RefPtr<Gdk::Pixbuf> pixbuf() const;
@@ -77,6 +78,12 @@ class MatImage
         /** Sets the key view the text hidden in the image */
         void set_key(const std::string& key);
 
+        /** Returns the SHA1-hashed string of the key set for the image */
+        std::string hash() const;
+        
+        /** Returns the text hidden in the image */
+        std::string reveal() const;
+
     private:
         cv::Mat mMat; ///< The OpenCV's image class that holds our data
 
@@ -85,12 +92,6 @@ class MatImage
         
         /** Conceals the given `text` in the image */
         void conceal(const std::string& text);
-
-        /** Returns the text hidden in the image */
-        std::string reveal() const;
-
-        /** Returns the SHA1-hashed string of the key set for the image */
-        std::string hash() const;
 };
 
 #endif // MATIMAGE_H

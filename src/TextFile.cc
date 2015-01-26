@@ -39,6 +39,12 @@ string TextFile::str() const
     return mText;
 }
 
+// Convert to std::string
+TextFile::operator std::string() const
+{
+    return mText;
+}
+
 // Save to disk
 void TextFile::save(const string& filename)
 {
