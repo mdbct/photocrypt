@@ -30,7 +30,6 @@ Win::Win() :
 {
     // Set window parameters
     set_title(PROGRAM_TITLE);
-    set_default_icon_from_file("icon.png");
 
     add(mVBoxMain);
 
