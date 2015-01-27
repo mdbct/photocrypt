@@ -48,8 +48,6 @@ Win::Win() :
             mem_fun(*this, &Win::onOpenImage) );
     mrActionGroup -> add( Action::create("ActionOpenText", "Open _Text File"),
             mem_fun(*this, &Win::onOpenText) );
-    mrActionGroup -> add( Action::create("ActionClose", Stock::CLOSE),
-            mem_fun(*this, &Win::close) );
     mrActionGroup -> add( Action::create("ActionQuit", Stock::QUIT),
             mem_fun(*this, &Win::close) );
 
@@ -87,7 +85,6 @@ Win::Win() :
         "           <menuitem action='ActionOpenImage' />"
         "           <menuitem action='ActionOpenText' />"
         "           <separator />"
-        "           <menuitem action='ActionClose' />"
         "           <menuitem action='ActionQuit' />"
         "       </menu>"
         "       <menu action='ActionEdit'>"
