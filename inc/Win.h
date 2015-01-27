@@ -29,6 +29,8 @@ class Win : public Gtk::Window
         virtual void onAction(const std::string msg);
         /** Displays a FileChooserDialog to open an image */
         virtual void onOpenImage();
+        /** Clears the image in the view */
+        virtual void onClearImage();
         /** Displays a FileChooserDialog to open a text file */
         virtual void onOpenText();
         /** Closes window */
@@ -78,6 +80,7 @@ class Win : public Gtk::Window
         Gtk::Image        mImage;
 
         Gtk::Button       mButtonOpenImage;
+        Gtk::Button       mButtonClearImage;
         Gtk::Label        mLabelImage;
 
         // Right

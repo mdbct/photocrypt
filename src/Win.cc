@@ -26,6 +26,7 @@ Win::Win() :
     mSized(false),
     mButtonSave("Save Text"),
     mButtonOpenImage("Open an Image"),
+    mButtonClearImage("Clear the Image"),
     mButtonOpenText("Open a Text File")
 {
     // Set window parameters
@@ -136,6 +137,7 @@ Win::Win() :
 
     // Fill mHBoxImage
     mHBoxImage.pack_start(mButtonOpenImage, PACK_SHRINK);
+    mHBoxImage.pack_start(mButtonClearImage, PACK_SHRINK);
     mHBoxImage.pack_end(mLabelImage, PACK_SHRINK);
 
     // Fill mFrameImage
@@ -174,6 +176,7 @@ Win::Win() :
 
     // Widgets in the left side
     mButtonOpenImage.signal_clicked().connect(mem_fun(*this, &Win::onOpenImage));
+    mButtonClearImage.signal_clicked().connect(mem_fun(*this, &Win::onClearImage));
 
     mImage.signal_size_allocate().connect(mem_fun(*this, &Win::onImageResize));
 
@@ -249,6 +252,12 @@ void Win::onOpenImage()
         string label = "Capacity: " + to_string(mMatImage.max()) + " Bytes";
         mLabelImage.set_label(label);
     }
+}
+
+void Win::onClearImage()
+{
+    mMatImage = MatImage();
+    mImage.clear();
 }
 
 void Win::onOpenText()
