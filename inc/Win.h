@@ -47,11 +47,21 @@ class Win : public Gtk::Window
         virtual void unsteg();
         /** Save text file */
         virtual void save();
+        
+        /** Cut */
+        virtual void onActionCut();
+        /** Copy */
+        virtual void onActionCopy();
+        /** Paste */
+        virtual void onActionPaste();
+        /** Paste handler */
+        virtual void onClipboardTextRecieved(const Glib::ustring& text);
 
         // Member widgets
 
         Glib::RefPtr<Gtk::ActionGroup>  mrActionGroup;
         Glib::RefPtr<Gtk::UIManager>    mrUIManager;
+        Glib::RefPtr<Gtk::Clipboard>    mrClipboard;
 
         Gtk::VBox mVBoxMain;
 

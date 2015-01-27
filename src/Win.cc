@@ -53,11 +53,11 @@ Win::Win() :
 
     // EditMenu
     mrActionGroup -> add( Action::create("ActionCut", Stock::CUT),
-            bind(mem_fun(*this, &Win::onAction), "Cut") );
+            mem_fun(*this, &Win::onActionCut) );
     mrActionGroup -> add( Action::create("ActionCopy", Stock::COPY),
-            bind(mem_fun(*this, &Win::onAction), "Copy") );
+            mem_fun(*this, &Win::onActionCopy) );
     mrActionGroup -> add( Action::create("ActionPaste", Stock::PASTE),
-            bind(mem_fun(*this, &Win::onAction), "Paste") );
+            mem_fun(*this, &Win::onActionPaste) );
 
     // ModeMenu
     RadioAction::Group groupMode;
@@ -112,6 +112,9 @@ Win::Win() :
     // Add the MenuBar and Toolbar:
     Widget* pMenuBar = mrUIManager -> get_widget("/MenuBar");
     //Widget* pToolbar = mrUIManager -> get_widget("/Toolbar");
+    
+    // Manage Clipboard:
+    mrClipboard = Clipboard::get();
 
     // Fill mVBoxMain:
     mVBoxMain.pack_start(*pMenuBar, PACK_SHRINK);
@@ -421,4 +424,29 @@ void Win::save()
         mStatusbar.push("Text file saved successfully.");
         mEntryKey.set_text("");
     }
+}
+
+void Win::onActionCut()
+{
+    onActionCopy();
+    mrTextBuffer -> erase_selection(false);
+}
+
+void Win::onActionCopy()
+{
+    TextBuffer::iterator start, end;
+    if (mrTextBuffer->get_selection_bounds(start, end)) {
+        ustring selectedText = mrTextBuffer->get_slice(start, end);
+        mrClipboard -> set_text(selectedText);
+    }
+}
+
+void Win::onActionPaste()
+{
+    mrClipboard -> request_text(mem_fun(*this, &Win::onClipboardTextRecieved));
+}
+
+void Win::onClipboardTextRecieved(const ustring& text)
+{
+    mrTextBuffer -> insert_at_cursor(text);
 }
