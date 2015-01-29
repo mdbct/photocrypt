@@ -45,7 +45,7 @@ clean:
 	if [ -f steg ]; then rm steg; fi
 	if [ -f unsteg ]; then rm unsteg; fi
 	if [ -f photocrypt ]; then rm photocrypt; fi
-	if [ "$(shell ls -A $(ODIR))" ]; then rm $(ODIR)/*; fi
+	if [ "$(shell ls $(ODIR))" ]; then rm $(ODIR)/*.o; fi
 
 help:
 	@echo 	"The Makefile defines the following target:"
