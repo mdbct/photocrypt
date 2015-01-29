@@ -18,7 +18,7 @@ TextFile TextFile::open(const string& filename)
 {
     TextFile t;
 
-    ifstream file(filename);
+    ifstream file(filename.c_str());
 
     char c;
     while (file.get(c))
@@ -48,10 +48,11 @@ TextFile::operator std::string() const
 // Save to disk
 void TextFile::save(const string& filename)
 {
-    ofstream file(filename);
+    ofstream file(filename.c_str());
 
-    for (auto c : mText)
-        file.put(c);
+    string::iterator sit;
+    for (sit = mText.begin(); sit != mText.end(); ++sit)
+        file.put(*sit);
 }
 
 // `<<` overloading

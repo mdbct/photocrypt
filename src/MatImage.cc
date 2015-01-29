@@ -31,7 +31,7 @@ MatImage::MatImage(const string& filename)
 // Create from Pixbuf
 MatImage::MatImage(const RefPtr<Pixbuf>& p)
 {
-    auto pp = p->copy();
+    RefPtr<Pixbuf> pp = p->copy();
 
     mMat = Mat(
             Size(pp->get_width(), pp->get_height()), // Dimensions
@@ -166,8 +166,8 @@ void MatImage::set_key(const string& key)
 
     string hash = util::sha(key);
 
-    auto p = mMat.ptr<uchar>(0); // p points to the 0th row
-    auto iter = hash.begin();
+    uchar* p = mMat.ptr<uchar>(0); // p points to the 0th row
+    string::iterator iter = hash.begin();
 
     int i = 0;
     while (i < (40 * 8)) {
@@ -183,9 +183,10 @@ void MatImage::set_key(const string& key)
 // Conceal
 void MatImage::conceal(const string& text)
 {
-    auto mit = mMat.begin<uchar>() + cols();
+    MatIterator_<uchar> mit = mMat.begin<uchar>() + cols();
 
-    for (auto sit = text.begin(); sit != text.end(); ++sit) {
+    string::const_iterator sit;
+    for (sit = text.begin(); sit != text.end(); ++sit) {
         for (int i = 0; i < 8; ++i, ++mit) {
             setbit(*mit, getbit(*sit, i)); 
 
@@ -203,7 +204,7 @@ string MatImage::reveal() const
     string text;
 
     uchar c;
-    auto mit = mMat.begin<uchar>() + cols();
+    MatConstIterator_<uchar> mit = mMat.begin<uchar>() + cols();
     while (mit != mMat.end<uchar>()) {
         if (*mit == 0)
             break;
@@ -222,7 +223,7 @@ string MatImage::hash() const
 {
     string hashstr;
 
-    auto p = mMat.ptr<uchar>(0);
+    const uchar* p = mMat.ptr<uchar>(0);
 
     int i = 0;
     while (i < (40 * 8)) {
