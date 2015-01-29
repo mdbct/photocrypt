@@ -1,23 +1,39 @@
 /** @file
  *  Some global informations about the program.
  */
+#ifndef INFO_H
+#define INFO_H
+
 #include <vector>
 #include <gtkmm.h>
 
+/** The name of the program */
 const Glib::ustring PROGRAM_TITLE   = "Photocrypt";
+
+/** Current version of the program */
 const Glib::ustring PROGRAM_VERSION = "1.0";
 
+/** Array of project team members */
 const Glib::ustring _a[3] = {
     "Manish Munikar (070-BCT-520)",
     "Dipesh Pandey (070-BCT-514)",
     "Brihat Ratna Bajracharya (070-BCT-513)" };
-std::vector<Glib::ustring> PROGRAM_AUTHORS(_a, _a + 3);
 
+/** The list of team members as a vector */
+const std::vector<Glib::ustring> PROGRAM_AUTHORS(_a, _a + 3);
+
+/** Website of the project */
 const Glib::ustring PROGRAM_WEBSITE       = "https://github.com/mdbct/photocrypt";
+/** Label for the project website */
 const Glib::ustring PROGRAM_WEBSITE_LABEL = "@ Github";
+
+/** A brief description of the program */
 const Glib::ustring PROGRAM_DESCRIPTION   = "A simple steganography application.";
+
+/** A dummy copyright notice of the program */
 const Glib::ustring PROGRAM_COPYRIGHT     = "© 2015. MDBCT";
 
+/** The licence text of the program */
 const Glib::ustring PROGRAM_LICENSE = 
 "Copyright (c) 2015, MDBCT\n"
 "All rights reserved.\n"
@@ -44,3 +60,5 @@ const Glib::ustring PROGRAM_LICENSE =
 "ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT\n"
 "(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS\n"
 "SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.";
+
+#endif // INFO_H
