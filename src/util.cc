@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <iomanip>
 #include <iostream>
+#include <stdexcept>
 
 typedef unsigned char uchar;
 
@@ -43,27 +44,33 @@ string util::sha(const string& in)
 // Sets a bit.
 void util::setbit(uchar& p, const int bit, const int index)
 {
-    assert(bit == 0 or bit == 1);
-    assert(index >= 0 and index < 8);
+    if (bit < 0 or bit > 1)
+        throw out_of_range("Bit should be either 0 or 1.");
+
+    if (index < 0 or index > 7)
+        throw out_of_range("Index is out of range.");
 
     switch (bit)
     {
-        case 1:
-            p |= (1 << index);
-            break;
+    case 1:
+        p |= (1 << index);
+        break;
 
-        case 0:
-            p &= ~(1 << index);
-            break;
+    case 0:
+        p &= ~(1 << index);
+        break;
 
-        default:
-            exit(1);
+    default:
+        exit(1);
     }
 }
 
 // Get a bit.
 int util::getbit(const uchar& p, const int index)
 {
+    if (index < 0 or index > 7)
+        throw out_of_range("Index is out of range.");
+
     int isSet = p & (1 << index);
 
     return (isSet) ? 1 : 0;
