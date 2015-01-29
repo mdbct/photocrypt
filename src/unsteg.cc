@@ -8,25 +8,49 @@
 #include <string>
 #include "MatImage.h"
 #include <cassert>
+#include "util.h"
+#include "Error.h"
 
 using namespace std;
+using namespace util;
 
 int main(int argc, char** argv)
 {
-    // Must pass 1 argument
-    assert(argc == 2);
+    if (argc != 2)
+        error("USAGE: " + string(argv[0]) + " <stego-image>");
 
-    // Get the filename
+    // Get the string constants
     string stego_filename = argv[1];
     string key;
 
-    // Open the stego-image
+    // Open the files
     MatImage I = stego_filename;
 
-    // Ask for password:
-    cerr << "Enter password: ";
+    // Ask for password
+    cerr << "Enter the password: ";
     cin >> key;
 
-    // Display the hidden text
-    cout << I.unsteg(key) << endl;
+    string text;
+    try
+    {
+        text = I.unsteg(key);
+    }
+    catch (ImageEmptyError)
+    {
+        error("ERROR: Not a proper image.");
+    }
+    catch (ImageNotStegoError)
+    {
+        error("ERROR: Image is not stego.");
+    }
+    catch (KeyEmptyError)
+    {
+        error("ERROR: Password is empty.");
+    }
+    catch (KeyMismatchError)
+    {
+        error("ERROR: Password incorrect.");
+    }
+
+    cout << text << endl;
 }

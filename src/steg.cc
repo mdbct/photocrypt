@@ -8,37 +8,49 @@
 #include "MatImage.h"
 #include "TextFile.h"
 #include <string>
-#include <cassert>
-
+#include "Error.h"
+#include "util.h"
 using namespace std;
+using namespace util;
 
 int main(int argc, char** argv)
 {
-    // Must pass 2 arguments
-    assert(argc == 3);
+    if (argc < 3 or argc > 4)
+        error("USAGE: " + string(argv[0]) + " <carrier-image> <text-file> [<stego-image>]");
 
-    // Set the filenames in strings
+    // Get the string constants
     string image_filename = argv[1];
     string text_filename = argv[2];
-    string stego_filename = "out.png";
+    string stego_filename = (argc == 4)? argv[3] : "out.png";
     string key;
 
-    // Open the image and the text file
+    // Open the files
     MatImage I = image_filename;
     TextFile file = TextFile::open(text_filename);
 
-    // Display useful information
-    cout << "Capacity:  " << I.max() << endl;
-    cout << "Text size: " << file.size() << endl;
-
-    // Text size should be less than the maximum capacity of the image
-    assert(file.size() < I.max());
-
-    // Ask to enter a password
-    cout << "Enter a password: ";
+    // Ask for password
+    cerr << "Enter a password: ";
     cin >> key;
 
-    // Steg the shit
-    I.steg(file.str(), key).save(stego_filename);
-    cout << "Stego image written to " + stego_filename << endl;
+    try
+    {
+        I.steg(file.str(), key).save(stego_filename);
+        cout << "Stego-image saved as `" << stego_filename << "`." << endl;
+    }
+    catch (ImageEmptyError)
+    {
+        error("ERROR: Not a proper image.");
+    }
+    catch (TextEmptyError)
+    {
+        error("ERROR: The text is empty.");
+    }
+    catch (KeyEmptyError)
+    {
+        error("ERROR: Password is empty.");
+    }
+    catch (InsufficientImageError)
+    {
+        error("ERROR: Image is not large enough to hide the text.");
+    }
 }

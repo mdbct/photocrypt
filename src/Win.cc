@@ -397,6 +397,8 @@ void Win::unsteg()
     mrTextBuffer -> set_text(text);
     mTextView.set_sensitive();
     mButtonSave.set_sensitive();
+    mStatusbar.pop();
+    mStatusbar.push("Secret text successfully extracted.");
 }
 
 void Win::onTextBufferChange()
