@@ -72,15 +72,50 @@ void MatImage::save(const string& filename) const
 
 
 // Getters
-long MatImage::cols() const { return  mMat.cols; }
-long MatImage::rows() const { return  mMat.rows; }
-long MatImage::step() const { return  mMat.step; }
-short MatImage::channels() const { return  mMat.channels(); }
-short MatImage::bps() const { return  sizeof(*mMat.data) * 8; }
-byte* MatImage::data() const { return  mMat.data; }
-long MatImage::max() const { return (cols() * (rows() - 1)) / 8; }
-bool MatImage::empty() const { return mMat.empty(); }
-bool MatImage::is_stego() const { return (hash().size() == 40); }
+long MatImage::cols() const
+{
+    return mMat.cols;
+}
+
+long MatImage::rows() const
+{
+    return mMat.rows;
+}
+
+long MatImage::step() const
+{
+    return mMat.step;
+}
+
+short MatImage::channels() const
+{
+    return mMat.channels();
+}
+
+short MatImage::bps() const
+{
+    return  sizeof(*mMat.data) * 8;
+}
+
+byte* MatImage::data() const
+{
+    return  mMat.data;
+}
+
+long MatImage::max() const
+{
+    return (cols() * (rows() - 1)) / 8;
+}
+
+bool MatImage::empty() const
+{
+    return mMat.empty();
+}
+
+bool MatImage::is_stego() const
+{
+    return (hash().size() == 40);
+}
 
 
 // Convert to a Pixbuf
@@ -94,7 +129,8 @@ RefPtr<Pixbuf> MatImage::pixbuf() const
             8,                      // Bits per sample (only 8 supported)
             mMat.cols,              // Width
             mMat.rows,              // Height
-            mMat.step);             // Bytes per row (aka. rowstride or step)
+            mMat.step               // Bytes per row (aka. rowstride or step)
+            );
 }
 
 // Scale the image to given width and height
@@ -126,7 +162,6 @@ RefPtr<Pixbuf> MatImage::fit(int width, int height) const
         return this -> scale(width, 0);
 }
 
-
 // Display an image using OpenCV
 void  MatImage::show(int msecs) const
 {
@@ -139,16 +174,25 @@ void  MatImage::show(int msecs) const
 // Steg
 MatImage& MatImage::steg(const string& text, const string& key)
 {
-    if (mMat.empty()) throw ImageEmptyError();
-    if (text.empty()) throw TextEmptyError();
-    if (key.empty()) throw KeyEmptyError();
-    if (cols() < 110) throw InsufficientImageError();
-    if (text.size() >= max()) throw InsufficientImageError();
+    if (mMat.empty())
+        throw ImageEmptyError();
+
+    if (text.empty())
+        throw TextEmptyError();
+
+    if (key.empty())
+        throw KeyEmptyError();
+
+    if (cols() < 110)
+        throw InsufficientImageError();
+
+    if (text.size() >= max())
+        throw InsufficientImageError();
 
     set_key(key);
     conceal(text);
 
-    return *this;
+    return (*this);
 }
 
 // Unsteg
@@ -156,37 +200,46 @@ string MatImage::unsteg(const string& key) const
 {
     assert(util::sha(key).size() == 40);
 
-    if (mMat.empty()) throw ImageEmptyError();
-    if (not is_stego()) throw ImageNotStegoError();
-    if (util::sha(key) != hash()) throw KeyMismatchError();
+    if (mMat.empty())
+        throw ImageEmptyError();
+
+    if (not is_stego())
+        throw ImageNotStegoError();
+
+    if (util::sha(key) != hash())
+        throw KeyMismatchError();
 
     return reveal();
 }
 
+
+/* PRIVATE HELPERS */
+
 // Set a key for the image
 void MatImage::set_key(const string& key)
 {
-    assert(key.size() > 0);
+    if (key.empty())
+        throw KeyEmptyError();
 
     string hash = util::sha(key);
 
-    uchar* p = mMat.ptr<uchar>(0); // p points to the 0th row
+    uchar* p = mMat.ptr<uchar>(0); // p points to the first element of 0th row
     string::iterator iter = hash.begin();
 
     int i = 0;
     while (i < (40 * 8)) {
-        uchar c = *iter++;
+        uchar c = *(iter++);
         for (int j = 0; j < 8; ++j, ++i)
             setbit(p[i], getbit(c, j));
     }
 }
 
-
-// PRIVATE HELPERS:
-
 // Conceal
 void MatImage::conceal(const string& text)
 {
+    if (text.empty())
+        throw TextEmptyError();
+
     MatIterator_<uchar> mit = mMat.begin<uchar>() + cols();
 
     string::const_iterator sit;
@@ -194,8 +247,7 @@ void MatImage::conceal(const string& text)
         for (int i = 0; i < 8; ++i, ++mit) {
             setbit(*mit, getbit(*sit, i)); 
 
-            if (*mit == 0)
-                *mit = 2;
+            if (*mit == 0) *mit = 2;
         }
     }
 
@@ -205,6 +257,9 @@ void MatImage::conceal(const string& text)
 // Reveal the hidden text
 string MatImage::reveal() const
 {
+    if (not is_stego())
+        throw ImageNotStegoError();
+
     string text;
 
     uchar c;

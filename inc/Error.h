@@ -2,22 +2,24 @@
  *
  *  This file declares some exceptions used in this project
  */
+#ifndef ERROR_H
+#define ERROR_H
 
 #include <string>
 
 /** A base class for exceptions in our project */
 class Error
 {
-    public:
-        /** Constructs an `Error` object with a given message */
-        Error(const std::string& msg = "");
+public:
+    /** Constructs an `Error` object with a given message */
+    Error(const std::string& msg = "");
 
-        /** Returns the message of the exception */
-        std::string what() const;
+    /** Returns the message of the exception */
+    std::string what() const;
 
-    private:
-        /** The message of the exception */
-        std::string mMsg;
+private:
+    /** The message of the exception */
+    std::string mMsg;
 };
 
 /** The exception thrown when one tries to manipulate empty `MatImage` */
@@ -55,3 +57,5 @@ struct KeyMismatchError : public Error
 {
     KeyMismatchError(const std::string& msg = "");
 };
+
+#endif // ERROR_H

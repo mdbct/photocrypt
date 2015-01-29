@@ -61,23 +61,26 @@ ostream& operator<<(ostream& out, const TextFile& textFile)
     return (out << textFile.str());
 }
 
-// Append
+// Append a std::string object
 TextFile& TextFile::append(const string& str)
 {
     mText += str;
     return *this;
 }
 
+// Append a std::string object using `+=` operator
 TextFile& TextFile::operator+=(const string& str)
 {
     return this->append(str);
 }
 
+// Append a TextFile object
 TextFile& TextFile::append(const TextFile& textFile)
 {
     return this->append(textFile.str());
 }
 
+// Append a TextFile object using `+=` operator
 TextFile& TextFile::operator+=(const TextFile& textFile)
 {
     return this->append(textFile.str());

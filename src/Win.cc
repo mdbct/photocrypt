@@ -113,7 +113,7 @@ Win::Win() :
     // Add the MenuBar and Toolbar:
     Widget* pMenuBar = mrUIManager -> get_widget("/MenuBar");
     //Widget* pToolbar = mrUIManager -> get_widget("/Toolbar");
-    
+
     // Manage Clipboard:
     mrClipboard = Clipboard::get();
 
@@ -323,22 +323,30 @@ void Win::onModeUnsteg()
 
 void Win::steg()
 {
-    try {
+    try
+    {
         mMatImage.steg((mrTextBuffer->get_text()).raw(), mEntryKey.get_text().raw());
-    } catch (ImageEmptyError) {
+    }
+    catch (ImageEmptyError)
+    {
         display_error("Select an image first.");
         return;
-    } catch (TextEmptyError) {
+    }
+    catch (TextEmptyError)
+    {
         display_error("There is no text to hide.");
         return;
-    } catch (KeyEmptyError) {
+    }
+    catch (KeyEmptyError)
+    {
         display_error("You must set a password.");
         return;
-    } catch (InsufficientImageError) {
+    }
+    catch (InsufficientImageError)
+    {
         display_error("The image is not large enough.");
         return;
     }
-
 
     FileChooserDialog d(*this, "Save stego image as...", FILE_CHOOSER_ACTION_SAVE);
     d.add_button(Stock::CANCEL, RESPONSE_CANCEL);
