@@ -136,9 +136,10 @@ RefPtr<Pixbuf> MatImage::pixbuf() const
 // Scale the image to given width and height
 RefPtr<Pixbuf> MatImage::scale(int width, int height) const
 {
-    assert(width > 0 or height > 0);
+    if (width <= 0 and height <= 0)
+        throw invalid_argument("Both arguments can't be zero simultaneously.");
 
-    double ratio = ((double) cols()) / rows();
+    double ratio = static_cast<double>(cols()) / rows();
 
     if (width <= 0)
         width = height * ratio;
@@ -151,10 +152,11 @@ RefPtr<Pixbuf> MatImage::scale(int width, int height) const
 // Returns a scaled image that fits within given dimenstion
 RefPtr<Pixbuf> MatImage::fit(int width, int height) const
 {
-    assert(width > 0 and height > 0);
+    if (width <= 0 or height <= 0)
+        throw invalid_argument("Both arguments should be greater than zero");
 
-    double win_ratio = ((double) width) / height;
-    double img_ratio = ((double) cols()) / rows();
+    double win_ratio = static_cast<double>(width) / height;
+    double img_ratio = static_cast<double>(cols()) / rows();
 
     if (win_ratio > img_ratio)
         return this -> scale(0, height);
@@ -198,7 +200,7 @@ MatImage& MatImage::steg(const string& text, const string& key)
 // Unsteg
 string MatImage::unsteg(const string& key) const
 {
-    assert(util::sha(key).size() == 40);
+    assert(sha(key).size() == 40);
 
     if (mMat.empty())
         throw ImageEmptyError();
@@ -206,7 +208,7 @@ string MatImage::unsteg(const string& key) const
     if (not is_stego())
         throw ImageNotStegoError();
 
-    if (util::sha(key) != hash())
+    if (sha(key) != hash())
         throw KeyMismatchError();
 
     return reveal();
@@ -221,7 +223,7 @@ void MatImage::set_key(const string& key)
     if (key.empty())
         throw KeyEmptyError();
 
-    string hash = util::sha(key);
+    string hash = sha(key);
 
     uchar* p = mMat.ptr<uchar>(0); // p points to the first element of 0th row
     string::iterator iter = hash.begin();

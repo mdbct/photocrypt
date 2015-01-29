@@ -24,6 +24,9 @@ int  getbit(const unsigned char& p, const int index = 0);
 /** Converts a real number to string */
 std::string to_str(double number);   
 
+/** Displays an error message and quits program */
+void error(const std::string& msg, int return_value = 1);
+
 } // namespace util
 
 #endif // UTIL_H

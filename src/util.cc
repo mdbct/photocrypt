@@ -84,3 +84,11 @@ string util::to_str(double number)
     out << number;
     return out.str();
 }
+
+
+// Display an error and quit
+void util::error(const string& msg, int return_value)
+{
+    cerr << msg << endl;
+    exit(return_value);
+}
