@@ -58,6 +58,8 @@ class Win : public Gtk::Window
         virtual void onActionPaste();
         /** Paste handler */
         virtual void onClipboardTextRecieved(const Glib::ustring& text);
+        /** Displays a error dialog */
+        virtual void display_error(const std::string& msg = "Error.");
 
         // Member widgets
 

@@ -6,16 +6,17 @@
 
 const Glib::ustring PROGRAM_TITLE   = "Photocrypt";
 const Glib::ustring PROGRAM_VERSION = "1.0";
-const std::vector<Glib::ustring> PROGRAM_AUTHORS = {
-    "Manish Munikar <munikarmanish@gmail.com>",
-    "Dipesh Pandey <dipesh@pandey.com>",
-    "Brihat Ratna Bajracharya <brihat@bajracharya.com>"
-};
+
+const Glib::ustring _a[3] = {
+    "Manish Munikar (070-BCT-520)",
+    "Dipesh Pandey (070-BCT-514)",
+    "Brihat Ratna Bajracharya (070-BCT-513)" };
+std::vector<Glib::ustring> PROGRAM_AUTHORS(_a, _a + 3);
 
 const Glib::ustring PROGRAM_WEBSITE       = "https://github.com/mdbct/photocrypt";
 const Glib::ustring PROGRAM_WEBSITE_LABEL = "@ Github";
 const Glib::ustring PROGRAM_DESCRIPTION   = "A simple steganography application.";
-const Glib::ustring PROGRAM_COPYRIGHT     = "© MDBCT. 2015";
+const Glib::ustring PROGRAM_COPYRIGHT     = "© 2015. MDBCT";
 
 const Glib::ustring PROGRAM_LICENSE = 
 "Copyright (c) 2015, MDBCT\n"

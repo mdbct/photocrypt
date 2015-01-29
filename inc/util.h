@@ -20,6 +20,10 @@ namespace util
     /** Gets a bit. */
     int  getbit(const unsigned char& p, const int index = 0);
 
+    
+    /** Converts a real number to string */
+    std::string to_str(double number);   
+
 } // namespace util
 
 #endif // UTIL_H

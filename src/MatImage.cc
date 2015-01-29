@@ -7,6 +7,7 @@
 #include <cassert>
 #include "util.h"
 #include <string>
+#include "Error.h"
 
 using namespace cv;
 using namespace std;
@@ -79,6 +80,7 @@ short MatImage::bps() const { return  sizeof(*mMat.data) * 8; }
 byte* MatImage::data() const { return  mMat.data; }
 long MatImage::max() const { return (cols() * (rows() - 1)) / 8; }
 bool MatImage::empty() const { return mMat.empty(); }
+bool MatImage::is_stego() const { return (hash().size() == 40); }
 
 
 // Convert to a Pixbuf
@@ -137,9 +139,11 @@ void  MatImage::show(int msecs) const
 // Steg
 MatImage& MatImage::steg(const string& text, const string& key)
 {
-    assert(cols() >= 110);
-    assert(text.size() < max());
-    assert(key.size() > 0);
+    if (mMat.empty()) throw ImageEmptyError();
+    if (text.empty()) throw TextEmptyError();
+    if (key.empty()) throw KeyEmptyError();
+    if (cols() < 110) throw InsufficientImageError();
+    if (text.size() >= max()) throw InsufficientImageError();
 
     set_key(key);
     conceal(text);
@@ -152,9 +156,9 @@ string MatImage::unsteg(const string& key) const
 {
     assert(util::sha(key).size() == 40);
 
-    // Verify password
-    assert(hash().size() == 40);
-    assert(util::sha(key) == hash());
+    if (mMat.empty()) throw ImageEmptyError();
+    if (not is_stego()) throw ImageNotStegoError();
+    if (util::sha(key) != hash()) throw KeyMismatchError();
 
     return reveal();
 }

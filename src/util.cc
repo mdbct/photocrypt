@@ -9,7 +9,6 @@
 #include <iomanip>
 #include <iostream>
 
-typedef uint8_t byte;
 typedef unsigned char uchar;
 
 using namespace std;
@@ -68,4 +67,13 @@ int util::getbit(const uchar& p, const int index)
     int isSet = p & (1 << index);
 
     return (isSet) ? 1 : 0;
+}
+
+
+// Convert a number to string
+string util::to_str(double number)
+{
+    ostringstream out;
+    out << number;
+    return out.str();
 }

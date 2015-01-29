@@ -2,12 +2,13 @@
  *  This file defines the `Win` class
  */
 #include "Win.h"
-#include "info.h"
+#include "INFO.h"
 #include <iostream>
 #include <string>
 #include "MatImage.h"
 #include "TextFile.h"
 #include "util.h"
+#include "Error.h"
 
 using namespace Gtk;
 using Glib::RefPtr;
@@ -15,7 +16,7 @@ using Glib::ustring;
 using sigc::mem_fun;
 using sigc::bind;
 using std::string;
-using std::to_string;
+using util::to_str;
 using Gdk::Pixbuf;
 
 // Default constructor for our main window
@@ -121,7 +122,7 @@ Win::Win() :
     //mVBoxMain.pack_start(*pToolbar, PACK_SHRINK);
     mVBoxMain.pack_start(mHBoxMain);
     mVBoxMain.pack_start(mStatusbar, PACK_SHRINK);
-    mStatusbar.push("Photocrypt 1.0 (C) 2015. MDBCT");
+    mStatusbar.push(PROGRAM_TITLE + " " + PROGRAM_VERSION + " " + PROGRAM_COPYRIGHT);
 
     // Fill mHBoxMain:
     mHBoxMain.set_spacing(0);
@@ -249,7 +250,7 @@ void Win::onOpenImage()
         string filename = d.get_filename();
         mMatImage = filename;
         mImage.set(mMatImage.fit(mImage.get_width(), mImage.get_height()));
-        string label = "Capacity: " + to_string(mMatImage.max()) + " Bytes";
+        string label = "Capacity: " + to_str(mMatImage.max()) + " Bytes";
         mLabelImage.set_label(label);
     }
 }
@@ -258,6 +259,7 @@ void Win::onClearImage()
 {
     mMatImage = MatImage();
     mImage.clear();
+    mLabelImage.set_label("Select an image");
 }
 
 void Win::onOpenText()
@@ -321,36 +323,22 @@ void Win::onModeUnsteg()
 
 void Win::steg()
 {
-    TextFile t = (mrTextBuffer->get_text()).raw();
-
-    if (mMatImage.empty()) {
-        MessageDialog(*this,
-                "Please select an image first.", false,
-                MESSAGE_ERROR).run();
+    try {
+        mMatImage.steg((mrTextBuffer->get_text()).raw(), mEntryKey.get_text().raw());
+    } catch (ImageEmptyError) {
+        display_error("Select an image first.");
+        return;
+    } catch (TextEmptyError) {
+        display_error("There is no text to hide.");
+        return;
+    } catch (KeyEmptyError) {
+        display_error("You must set a password.");
+        return;
+    } catch (InsufficientImageError) {
+        display_error("The image is not large enough.");
         return;
     }
 
-    if (t.size() == 0) {
-        MessageDialog(*this,
-                "You must enter a message or open a text file.", false,
-                MESSAGE_ERROR).run();
-        return;
-    }
-
-    string key = mEntryKey.get_text().raw();
-    if (key.empty()) {
-        MessageDialog(*this,
-                "You must set a password.", false,
-                MESSAGE_ERROR).run();
-        return;
-    }
-
-    if (t.size() >= mMatImage.max()) {
-        MessageDialog(*this,
-                "Text size has exceeded image capacity.", false,
-                MESSAGE_ERROR).run();
-        return;
-    }
 
     FileChooserDialog d(*this, "Save stego image as...", FILE_CHOOSER_ACTION_SAVE);
     d.add_button(Stock::CANCEL, RESPONSE_CANCEL);
@@ -363,8 +351,7 @@ void Win::steg()
     d.add_filter(filterImage);
 
     if (d.run() == RESPONSE_OK) {
-        string filename = d.get_filename().raw();
-        mMatImage.steg(t.str(), key).save(filename);
+        mMatImage.save(d.get_filename().raw());
         mStatusbar.pop();
         mStatusbar.push("Stego-image written successfully.");
         mEntryKey.set_text("");
@@ -373,42 +360,41 @@ void Win::steg()
 
 void Win::unsteg()
 {
-    if (mMatImage.empty()) {
-        MessageDialog(*this,
-                "Select a image file first.", false,
-                MESSAGE_ERROR).run();
+    string text;
+    try 
+    {
+        text = mMatImage.unsteg(mEntryKey.get_text().raw());
+    }
+    catch (ImageEmptyError)
+    {
+        display_error("Select an image first.");
+        return;
+    }
+    catch (ImageNotStegoError)
+    {
+        display_error("The selected image is not a stego-image.");
+        return;
+    }
+    catch (KeyEmptyError)
+    {
+        display_error("You must enter a password.");
+        return;
+    }
+    catch (KeyMismatchError)
+    {
+        display_error("Incorrect password.");
         return;
     }
 
-    if (mMatImage.hash().size() != 40) {
-        MessageDialog(*this,
-                "The image is not a stego-image", false,
-                MESSAGE_ERROR).run();
-        return;
-    }
-
-    string key = mEntryKey.get_text().raw();
-    if (util::sha(key) != mMatImage.hash()) {
-        MessageDialog(*this,
-                "Incorrect password.", false,
-                MESSAGE_ERROR).run();
-        return;
-    }
-
-    string text = mMatImage.reveal();
     mrTextBuffer -> set_text(text);
-
-    mTextView.set_sensitive(true);
-    mButtonSave.set_sensitive(true);
-
-    mStatusbar.pop();
-    mStatusbar.push("Hidden text successfully encoded.");
+    mTextView.set_sensitive();
+    mButtonSave.set_sensitive();
 }
 
 void Win::onTextBufferChange()
 {
     int size = (mrTextBuffer -> get_text()).size();
-    string label = "Size: " + to_string(size) + " Bytes";
+    string label = "Size: " + to_str(size) + " Bytes";
     mLabelText.set_label(label);
 }
 
@@ -457,4 +443,9 @@ void Win::onActionPaste()
 void Win::onClipboardTextRecieved(const ustring& text)
 {
     mrTextBuffer -> insert_at_cursor(text);
+}
+
+void Win::display_error(const string& msg)
+{
+    MessageDialog(*this, msg, MESSAGE_ERROR).run();
 }
