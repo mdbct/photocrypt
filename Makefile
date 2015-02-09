@@ -26,17 +26,17 @@ vpath %.cc $(CDIR)
 ##### Rules
 
 photocrypt: $(OBJECTS) $(ODIR)/main.o $(ODIR)/Win.o
-	$(CC) $(LFLAGS) $^ -o $@
+	$(CC) $^ -o $@ $(LFLAGS)
 
 cli: steg unsteg
 
 all: photocrypt cli
 
 steg: $(OBJECTS) $(ODIR)/steg.o
-	$(CC) $(LFLAGS) $^ -o $@
+	$(CC) $^ -o $@ $(LFLAGS)
 
 unsteg: $(OBJECTS) $(ODIR)/unsteg.o
-	$(CC) $(LFLAGS) $^ -o $@
+	$(CC) $^ -o $@ $(LFLAGS)
 
 $(ODIR)/%.o: %.cc $(HDIR)/*.h
 	$(CC) $(CFLAGS) $< -c -o $@
