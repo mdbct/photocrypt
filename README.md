@@ -1,5 +1,4 @@
-photocrypt
-==========
+# photocrypt
 
 A [steganography](http://en.wikipedia.org/wiki/Steganography) program that
 hides text in images. It has both a graphical ([gtkmm](http://gtkmm.org))
@@ -34,49 +33,72 @@ The CLI programs writes the stego-image in `out.png` file in the current
 directory, and writes the hidden text in `stdout`.
 
 
-Requirements
-------------
+## Requirements
 
 - [GNU gcc](http://gcc.gnu.org)
 - [GNU make](http://www.gnu.org/software/make)
 - [pkg-config](http://pkgconfig.freedesktop.org/wiki/) package
-- [OpenCV 2](http://opencv.org) library
-- <em>[gtkmm 2.4](http://gtkmm.org)</em> library
+- [OpenCV](http://opencv.org) 2 library
+- [gtkmm](http://gtkmm.org) 2.4 library
 - [OpenSSL](http://openssl.org) library
 
-Compilation
------------
+
+## Installation
+
+#### Arch Linux
+
+[Photocrypt](https://aur.archlinux.org/packages/photocrypt-git)
+is available for [Arch Linux](https://archlinux.org) via
+[AUR](https://aur.archlinux.org):
+
+```bash
+yaourt photocrypt-git
+```
+
+### Manual Compilation
 
 To build the GUI program:
 
-    make
+```bash
+make
+```
 
 To build the CLI program:
 
-    make cli
+```bash
+make cli
+```
 
 To clean:
 
-    make clean
+```bash
+make clean
+```
 
 To list available `make` targets:
 
-    make help
+```bash
+make help
+```
 
 
-Usage
------
+## Usage
 
 To open the GUI frontend, run:
 
-    ./photocrypt
+```bash
+./photocrypt
+```
 
 Or if you are a terminal-lover like me, here's how you can hide a text file
 `secret.txt` in an image `image.jpg`:
 
-    ./steg image.jpg secret.txt
+```bash
+./steg image.jpg secret.txt
+```
 
 Similarly, to view the text hidden in a stego-image `stego.png`:
 
-    ./unsteg stego.png
-
+```bash
+./unsteg stego.png
+```
