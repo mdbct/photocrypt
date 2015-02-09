@@ -1,4 +1,4 @@
-# photocrypt
+# Photocrypt
 
 A [steganography](http://en.wikipedia.org/wiki/Steganography) program that
 hides text in images. It has both a graphical ([gtkmm](http://gtkmm.org))
