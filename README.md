@@ -18,6 +18,9 @@ The algorithm used in this program can be explained briefly as:
 * The secret data starts from the beginning of the 2nd row. Only LSBs of
   the pixels are changed. Other 7 more significant bits are left as is.
 
+  > I know this is very unsecure way to hide data. But we are in learning
+  > phase and we'll make this program very secure when we release 1.0!
+
 * The end of text is marked by a pixel whose blue-coefficient is zero. Blue,
   because OpenCV stores images in BGR format instead of RGB. So if a
   blue-coefficient is found to be already zero before reaching the end of
