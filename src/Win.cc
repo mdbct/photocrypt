@@ -238,10 +238,10 @@ void Win::onOpenImage()
     // Add filter to select only images
     FileFilter filterImage;
     filterImage.set_name("Image files");
-    filterImage.add_pattern("*.jpg");
-    filterImage.add_pattern("*.png");
-    filterImage.add_pattern("*.bmp");
-    filterImage.add_pattern("*.gif");
+    filterImage.add_mime_type("image/bmp");
+    filterImage.add_mime_type("image/png");
+    filterImage.add_mime_type("image/jpeg");
+    filterImage.add_mime_type("image/gif");
 
     d.add_filter(filterImage);
 
@@ -354,8 +354,8 @@ void Win::steg()
 
     FileFilter filterImage;
     filterImage.set_name("BMP or PNG Images");
-    filterImage.add_pattern("*.bmp");
-    filterImage.add_pattern("*.png");
+    filterImage.add_mime_type("image/bmp");
+    filterImage.add_mime_type("image/png");
     d.add_filter(filterImage);
 
     if (d.run() == RESPONSE_OK) {
