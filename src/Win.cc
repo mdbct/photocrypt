@@ -32,6 +32,7 @@ Win::Win() :
 {
     // Set window parameters
     set_title(PROGRAM_TITLE);
+    set_default_icon_from_file("/opt/photocrypt/icon.png");
 
     add(mVBoxMain);
 

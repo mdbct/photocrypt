@@ -4,11 +4,10 @@
 ##
 ######################################
 
-##### Macros
-
 HDIR      := inc
 ODIR      := obj
 CDIR      := src
+DESTDIR   := 
 
 SOURCES   := MatImage.cc TextFile.cc util.cc Error.cc
 OBJECTS   := $(SOURCES:%.cc=$(ODIR)/%.o)
@@ -23,43 +22,54 @@ vpath %.o $(ODIR)
 vpath %.cc $(CDIR)
 
 
-##### Rules
+###################################################### Rules
 
 photocrypt: $(OBJECTS) $(ODIR)/main.o $(ODIR)/Win.o
-	$(CC) $^ -o $@ $(LFLAGS)
+	@echo "Making $@"
+	@$(CC) $^ -o $@ $(LFLAGS)
 
 cli: steg unsteg
 
 all: photocrypt cli
 
 steg: $(OBJECTS) $(ODIR)/steg.o
-	$(CC) $^ -o $@ $(LFLAGS)
+	@echo "Making $@"
+	@$(CC) $^ -o $@ $(LFLAGS)
 
 unsteg: $(OBJECTS) $(ODIR)/unsteg.o
-	$(CC) $^ -o $@ $(LFLAGS)
+	@echo "Making $@"
+	@$(CC) $^ -o $@ $(LFLAGS)
 
 $(ODIR)/%.o: %.cc $(HDIR)/*.h
-	$(CC) $(CFLAGS) $< -c -o $@
+	@echo "Compiling $<"
+	@$(CC) $(CFLAGS) $< -c -o $@
 
-install: all uninstall
-	cp photocrypt steg unsteg README.md /opt/photocrypt/
-	ln -s /opt/photocrypt/photocrypt /usr/local/bin/photocrypt
-	ln -s /opt/photocrypt/steg       /usr/local/bin/steg
-	ln -s /opt/photocrypt/unsteg     /usr/local/bin/unsteg
+install: uninstall all
+	@echo "Installing"
+	@if ! [ -d "$(DESTDIR)/opt" ]; then mkdir "$(DESTDIR)/opt"; fi
+	@if ! [ -d "$(DESTDIR)/usr" ]; then mkdir "$(DESTDIR)/usr"; fi
+	@if ! [ -d "$(DESTDIR)/usr/bin" ]; then mkdir "$(DESTDIR)/usr/bin"; fi
+	@rsync photocrypt steg unsteg README.md icon.png $(DESTDIR)/opt/photocrypt/
+	@ln -s /opt/photocrypt/photocrypt $(DESTDIR)/usr/bin/photocrypt
+	@ln -s /opt/photocrypt/steg       $(DESTDIR)/usr/bin/steg
+	@ln -s /opt/photocrypt/unsteg     $(DESTDIR)/usr/bin/unsteg
 
 uninstall:
-	rm -rf /opt/photocrypt
-	rm -f /usr/local/bin/photocrypt
-	rm -f /usr/local/bin/steg
-	rm -f /usr/local/bin/unsteg
+	@echo "Uninstalling"
+	@rm -rf $(DESTDIR)/opt/photocrypt
+	@rm -f $(DESTDIR)/usr/bin/photocrypt
+	@rm -f $(DESTDIR)/usr/bin/steg
+	@rm -f $(DESTDIR)/usr/bin/unsteg
 
 clean: clean-exe clean-obj
 
 clean-exe:
-	rm -f photocrypt steg unsteg
+	@echo "Cleaning executables"
+	@rm -f photocrypt steg unsteg
 
 clean-obj:
-	rm -f $(ODIR)/*.o
+	@echo "Cleaning objects"
+	@rm -f $(ODIR)/*.o
 
 help:
 	@echo "The Makefile defines the following target:"
@@ -67,9 +77,9 @@ help:
 	@echo "   make cli        : Builds the CLI programs (steg & unsteg)"
 	@echo "   make steg       : Builds the CLI steg program"
 	@echo "   make unsteg     : Builds the CLI unsteg program"
-	@echo "   make install    : Installs the program into the system"
-	@echo "   make uninstall  : Uninstalls the program from the system"
 	@echo "   make all        : Builds everything"
 	@echo "   make clean      : Cleans the built files"
+	@echo "   make install    : Installs the program into the system"
+	@echo "   make uninstall  : Uninstalls the program from the system"
 	@echo "   make help       : Displays this help text"
 
