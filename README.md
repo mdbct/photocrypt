@@ -21,9 +21,9 @@ The algorithm used in this program can be explained briefly as:
   > I know this is very unsecure way to hide data. But we are in learning
   > phase and we'll make this program very secure when we release 1.0!
 
-* The end of text is marked by a pixel whose blue-coefficient is zero. Blue,
-  because OpenCV stores images in BGR format instead of RGB. So if a
-  blue-coefficient is found to be already zero before reaching the end of
+* The end of text is marked by a pixel whose red-coefficient is zero. Red,
+  because among RGG, red is said to be least sensitive to human eye. So if a
+  red-coefficient is found to be already zero before reaching the end of
   text, its 2nd LSB is set to 1, to prevent the decoding algorithm to think
   that it's the end of text.
 
@@ -58,50 +58,45 @@ is available for [Arch Linux](https://archlinux.org) via
 yaourt photocrypt-git
 ```
 
-### Manual Compilation
+### Manual installation
 
-To build the GUI program:
-
-```bash
-make
-```
-
-To build the CLI program:
+To compile the program:
 
 ```bash
-make cli
+make [all]
 ```
 
-To clean:
+To install to system:
 
 ```bash
-make clean
+sudo make install
 ```
 
-To list available `make` targets:
+To get the list of available make targets:
 
 ```bash
 make help
 ```
-
 
 ## Usage
 
 To open the GUI frontend, run:
 
 ```bash
-./photocrypt
+photocrypt
 ```
 
 Or if you are a terminal-lover like me, here's how you can hide a text file
 `secret.txt` in an image `image.jpg`:
 
 ```bash
-./steg image.jpg secret.txt
+steg image.jpg secret.txt
 ```
 
-Similarly, to view the text hidden in a stego-image `stego.png`:
+Similarly, to view the text hidden in a stego-image `stego.png` (You can then
+redirect the output to file yourself):
 
 ```bash
-./unsteg stego.png
+unsteg stego.png
 ```
+
