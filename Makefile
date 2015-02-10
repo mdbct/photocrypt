@@ -46,10 +46,9 @@ $(ODIR)/%.o: %.cc $(HDIR)/*.h
 
 install: uninstall all
 	@echo "Installing"
-	@if ! [ -d "$(DESTDIR)/opt" ]; then mkdir "$(DESTDIR)/opt"; fi
-	@if ! [ -d "$(DESTDIR)/usr" ]; then mkdir "$(DESTDIR)/usr"; fi
-	@if ! [ -d "$(DESTDIR)/usr/bin" ]; then mkdir "$(DESTDIR)/usr/bin"; fi
-	@rsync photocrypt steg unsteg README.md icon.png $(DESTDIR)/opt/photocrypt/
+	@mkdir -p "$(DESTDIR)/opt/photocrypt"
+	@mkdir -p "$(DESTDIR)/usr/bin"
+	@cp photocrypt steg unsteg README.md icon.png $(DESTDIR)/opt/photocrypt/
 	@ln -s /opt/photocrypt/photocrypt $(DESTDIR)/usr/bin/photocrypt
 	@ln -s /opt/photocrypt/steg       $(DESTDIR)/usr/bin/steg
 	@ln -s /opt/photocrypt/unsteg     $(DESTDIR)/usr/bin/unsteg

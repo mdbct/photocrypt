@@ -11,7 +11,7 @@
 const Glib::ustring PROGRAM_TITLE   = "Photocrypt";
 
 /** Current version of the program */
-const Glib::ustring PROGRAM_VERSION = "1.0";
+const Glib::ustring PROGRAM_VERSION = "0.1";
 
 /** Array of project team members */
 const Glib::ustring _a[3] = {
