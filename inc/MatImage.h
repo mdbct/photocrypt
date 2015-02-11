@@ -101,7 +101,7 @@ public:
 
     /** Extract the hidden text from the image.
      *
-     * @param   key     The password used to extrac the hidden text
+     * @param   key     The password used to extract the hidden text
      *
      * @return  The hidden text
      */
