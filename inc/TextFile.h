@@ -40,10 +40,12 @@ public:
 
     /** Appends the given string to the text file */
     TextFile& append(const std::string& str);
+    /** Appends the given string to the text file */
     TextFile& operator+=(const std::string& str);
 
     /** Appends the given text file to the text file */
     TextFile& append(const TextFile& textFile);
+    /** Appends the given text file to the text file */
     TextFile& operator+=(const TextFile& textFile);
 
     /** Saves the text file to the disk with the given filename */
