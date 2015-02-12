@@ -104,7 +104,7 @@ byte* MatImage::data() const
 
 long MatImage::max() const
 {
-    return (cols() * (rows() - 1)) / 8;
+    return (cols() * (rows() - 1));
 }
 
 bool MatImage::empty() const
@@ -112,10 +112,12 @@ bool MatImage::empty() const
     return mMat.empty();
 }
 
+/*
 bool MatImage::is_stego() const
 {
     return (hash().size() == 40);
 }
+*/
 
 
 // Convert to a Pixbuf
@@ -192,7 +194,7 @@ MatImage& MatImage::steg(const string& text, const string& key)
         throw InsufficientImageError();
 
     set_key(key);
-    conceal(text);
+    conceal(text, key);
 
     return (*this);
 }
@@ -205,13 +207,15 @@ string MatImage::unsteg(const string& key) const
     if (mMat.empty())
         throw ImageEmptyError();
 
+    /*
     if (not is_stego())
-        throw ImageNotStegoError();
+       throw ImageNotStegoError();
+    */
 
-    if (sha(key) != hash())
+    if (sha(key) != hash(key))
         throw KeyMismatchError();
 
-    return reveal();
+    return reveal(key);
 }
 
 
@@ -224,55 +228,123 @@ void MatImage::set_key(const string& key)
         throw KeyEmptyError();
 
     string hash = sha(key);
+    assert(hash.size() == 40);
+    hash.push_back(0);
 
-    uchar* p = mMat.ptr<uchar>(0); // p points to the first element of 0th row
-    string::iterator iter = hash.begin();
+    auto kit = key.begin();
+    vector<int> ignore[3];
 
-    int i = 0;
-    while (i < (40 * 8)) {
-        uchar c = *(iter++);
-        for (int j = 0; j < 8; ++j, ++i)
-            setbit(p[i], getbit(c, j));
+    auto mit = mMat.begin<Vec3b>();
+    for (auto hit = hash.begin(); hit != hash.end(); ++hit, ++mit)
+    {
+        // Get ignore bits
+        for (int i = 0; i < 3; ++i) {
+            int kval = static_cast<int>(*kit);
+
+            ignore[i] = { kval % 4 };
+            if (i == 2) ignore[i].push_back( (kval+1) % 4 );
+
+            kit++;
+            if (kit == key.end()) kit = key.begin();
+        }
+
+        // Set bits
+        uchar c = static_cast<uchar>(*hit);
+        int   b = 0;
+        
+        for (int clr = 0; clr < 3; ++clr) {
+            for (int i = 0; i < 4; ++i) {
+                auto pos = find( ignore[clr].begin(), ignore[clr].end(), i );
+                if (pos == ignore[clr].end()) {
+                    setbit( (*mit)[clr], getbit(c, b++), i );
+                }
+            }
+        }
     }
 }
 
 // Conceal
-void MatImage::conceal(const string& text)
+void MatImage::conceal(const string& text, const string& key)
 {
     if (text.empty())
         throw TextEmptyError();
 
-    MatIterator_<uchar> mit = mMat.begin<uchar>() + cols();
+    if (key.empty())
+        throw KeyEmptyError();
 
-    string::const_iterator sit;
-    for (sit = text.begin(); sit != text.end(); ++sit) {
-        for (int i = 0; i < 8; ++i, ++mit) {
-            setbit(*mit, getbit(*sit, i)); 
+    auto mit = mMat.begin<Vec3b>() + cols();
+    auto txt = text;
+    txt.push_back(0);
 
-            if (*mit == 0) *mit = 2;
+    vector<int> ignore[3];
+    auto kit = key.begin();
+
+    for (auto tit = txt.begin(); tit != txt.end(); ++tit, ++mit) {
+
+        // Get ignore bits
+        for (int i = 0; i < 3; ++i) {
+            int kval = static_cast<int>(*kit);
+
+            ignore[i] = { kval % 4 };
+            if (i == 2) ignore[i].push_back( (kval+1) % 4 );
+
+            kit++;
+            if (kit == key.end()) kit = key.begin();
+        }
+
+        // Set bits
+        uchar c = static_cast<uchar>(*tit);
+        int   b = 0;
+        
+        for (int clr = 0; clr < 3; ++clr) {
+            for (int i = 0; i < 4; ++i) {
+                auto pos = find( ignore[clr].begin(), ignore[clr].end(), i );
+                if (pos == ignore[clr].end()) {
+                    setbit( (*mit)[clr], getbit(c, b++), i );
+                }
+            }
         }
     }
-
-    *mit = 0;
 }
 
 // Reveal the hidden text
-string MatImage::reveal() const
+string MatImage::reveal(const string& key) const
 {
+    /*
     if (not is_stego())
         throw ImageNotStegoError();
-
+        */
     string text;
+    vector<int> ignore[3];
+    auto kit = key.begin();
 
-    uchar c;
-    MatConstIterator_<uchar> mit = mMat.begin<uchar>() + cols();
-    while (mit != mMat.end<uchar>()) {
-        if (*mit == 0)
-            break;
+    for (auto mit = mMat.begin<Vec3b>() + cols(); ; ++mit) {
 
-        for (int i = 0; i < 8; ++i, ++mit)
-            setbit(c, getbit(*mit), i);
+        // Get ignore bits
+        for (int i = 0; i < 3; ++i) {
+            int kval = static_cast<int>(*kit);
 
+            ignore[i] = { kval % 4 };
+            if (i == 2) ignore[i].push_back( (kval+1) % 4 );
+
+            kit++;
+            if (kit == key.end()) kit = key.begin();
+        }
+
+        // Set bits
+        uchar c;
+        int b = 0;
+
+        for (int clr = 0; clr < 3; ++clr) {
+            for (int i = 0; i < 4; ++i) {
+                auto pos = find( ignore[clr].begin(), ignore[clr].end(), i );
+                if (pos == ignore[clr].end()) {
+                    setbit( c, getbit( (*mit)[clr], i), b++ );
+                }
+            }
+        }
+
+        if (c == 0) break;
         text.push_back(c);
     }
 
@@ -280,20 +352,41 @@ string MatImage::reveal() const
 }
 
 // Get the hash string of the key
-string MatImage::hash() const
+string MatImage::hash(const string& key) const
 {
-    string hashstr;
+    string hash;
+    vector<int> ignore[3];
+    auto kit = key.begin();
 
-    const uchar* p = mMat.ptr<uchar>(0);
+    for (auto mit = mMat.begin<Vec3b>(); /*hash.size() != 40*/; ++mit) {
 
-    int i = 0;
-    while (i < (40 * 8)) {
+        // Get ignore bits
+        for (int i = 0; i < 3; ++i) {
+            int kval = static_cast<int>(*kit);
+
+            ignore[i] = { kval % 4 };
+            if (i == 2) ignore[i].push_back( (kval+1) % 4 );
+
+            kit++;
+            if (kit == key.end()) kit = key.begin();
+        }
+
+        // Set bits
         uchar c;
-        for (int j = 0; j < 8; ++j)
-            setbit(c, getbit(p[i++]), j);
+        int b = 0;
 
-        hashstr.push_back(c);
+        for (int clr = 0; clr < 3; ++clr) {
+            for (int i = 0; i < 4; ++i) {
+                auto pos = find( ignore[clr].begin(), ignore[clr].end(), i );
+                if (pos == ignore[clr].end()) {
+                    setbit( c, getbit( (*mit)[clr], i), b++ );
+                }
+            }
+        }
+
+        if (c == 0) break;
+        hash.push_back(c);
     }
 
-    return hashstr;
+    return hash;
 }

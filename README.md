@@ -6,26 +6,18 @@ and a command-line interface. It is written in C++.
 
 It implements the Least Significant Bit (LSB) algorithm with SHA1 password
 protection. Every bit of secret data is stored in the LSBs of the image pixel
-values. This makes the stego-image practically identical to the original
-image.
+values. The algorithm depends on the key so it is unfeasible to extract data
+without the key. This makes the stego-image practically identical to the
+original image.
 
 The algorithm used in this program can be explained briefly as:
 
 * The 1st row of image is used to store the 40-byte SHA1 hash string of the
-  password. Each bit of hash string is stored in the LSB of each byte of the
-  image.
+  password. The bits used to hide the data depends on the key itself.
 
-* The secret data starts from the beginning of the 2nd row. Only LSBs of
-  the pixels are changed. Other 7 more significant bits are left as is.
-
-  > I know this is very unsecure way to hide data. But we are in learning
-  > phase and we'll make this program very secure when we release 1.0!
-
-* The end of text is marked by a pixel whose red-coefficient is zero. Red,
-  because among RGG, red is said to be least sensitive to human eye. So if a
-  red-coefficient is found to be already zero before reaching the end of
-  text, its 2nd LSB is set to 1, to prevent the decoding algorithm to think
-  that it's the end of text.
+* The secret data starts from the beginning of the 2nd row. The bits used to
+  hide the data depends on the key itself. The value `\0` is appened at last to
+  mark the end of text.
 
 <blockquote>
 <strong>Note:</strong> You cannot extract text from a JPEG image because the
@@ -36,14 +28,15 @@ The CLI programs writes the stego-image in `out.png` file in the current
 directory, and writes the hidden text in `stdout`.
 
 
-## Requirements
+## Dependencies
 
-- [GNU gcc](http://gcc.gnu.org)
-- [GNU make](http://www.gnu.org/software/make)
-- [pkg-config](http://pkgconfig.freedesktop.org/wiki/) package
-- [OpenCV](http://opencv.org) 2 library
-- [gtkmm](http://gtkmm.org) 2.4 library
-- [OpenSSL](http://openssl.org) library
+- [GNU gcc](http://gcc.gnu.org): to compile
+- [GNU make](http://www.gnu.org/software/make): to build
+- [pkg-config](http://pkgconfig.freedesktop.org/wiki/): to link
+- [OpenCV](http://opencv.org) 2 library: for image processing
+- [gtkmm](http://gtkmm.org) 2.4 library: for GUI
+- [OpenSSL](http://openssl.org) library: for security
+- (Optional) [rsync](https://rsync.samba.org) tool: to install into system
 
 
 ## Installation

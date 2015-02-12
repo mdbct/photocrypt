@@ -52,7 +52,7 @@ public:
     uint8_t* data()     const; ///< Returns the pointer to the pixel array
     long     max()      const; ///< Returns the maximum size of text this image can hide
     bool     empty()    const; ///< Checks if image is empty
-    bool     is_stego() const; ///< Checks if image is a stego-image
+    //bool     is_stego() const; ///< Checks if image is a stego-image
 
     /** Converts the image into a `Gdk::Pixbuf` object.
      *  
@@ -117,13 +117,13 @@ private:
     void set_key(const std::string& key);
 
     /** Conceals the given `text` in the image */
-    void conceal(const std::string& text);
+    void conceal(const std::string& text, const std::string& key);
 
     /** Returns the SHA1-hashed string of the key set for the image */
-    std::string hash() const;
+    std::string hash(const std::string& key) const;
 
     /** Returns the text hidden in the image */
-    std::string reveal() const;
+    std::string reveal(const std::string& key) const;
 };
 
 #endif // MATIMAGE_H

@@ -14,8 +14,8 @@ OBJECTS   := $(SOURCES:%.cc=$(ODIR)/%.o)
 
 LIBRARIES := gtkmm-2.4 opencv openssl
 CC        := g++
-CFLAGS    := -O `pkg-config --cflags $(LIBRARIES)` -I $(HDIR)
-LFLAGS    := -O `pkg-config --libs $(LIBRARIES)`
+CFLAGS    := -O `pkg-config --cflags $(LIBRARIES)` -I $(HDIR) -std=c++11
+LFLAGS    := -O `pkg-config --libs $(LIBRARIES)` -std=c++11
 
 vpath %.h $(HDIR)
 vpath %.o $(ODIR)
