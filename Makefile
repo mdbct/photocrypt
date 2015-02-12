@@ -77,7 +77,7 @@ doc: $(HDIR)/* $(CDIR)/* README.md Doxyfile
 
 clean-doc:
 	@echo "Cleaning docs"
-	@rm -r doc
+	@rm -rf doc
 
 help:
 	@echo "The Makefile defines the following target:"
