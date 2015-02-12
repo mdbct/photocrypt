@@ -45,6 +45,16 @@ $(ODIR)/%.o: %.cc $(HDIR)/*.h
 	@mkdir -p $(ODIR)
 	@$(CC) $(CFLAGS) $< -c -o $@
 
+clean: clean-exe clean-obj clean-doc
+
+clean-exe:
+	@echo "Cleaning executables"
+	@rm -f photocrypt steg unsteg
+
+clean-obj:
+	@echo "Cleaning objects"
+	@rm -rf $(ODIR)
+
 install: uninstall all
 	@echo "Installing"
 	@mkdir -p "$(DESTDIR)/opt/photocrypt"
@@ -61,15 +71,13 @@ uninstall:
 	@rm -f $(DESTDIR)/usr/bin/steg
 	@rm -f $(DESTDIR)/usr/bin/unsteg
 
-clean: clean-exe clean-obj
+doc: $(HDIR)/* $(CDIR)/* README.md Doxyfile
+	@doxygen 1>/dev/null 2>&1
+	@echo "Documentation generated in \`doc\` directory."
 
-clean-exe:
-	@echo "Cleaning executables"
-	@rm -f photocrypt steg unsteg
-
-clean-obj:
-	@echo "Cleaning objects"
-	@rm -rf $(ODIR)
+clean-doc:
+	@echo "Cleaning docs"
+	@rm -r doc
 
 help:
 	@echo "The Makefile defines the following target:"
@@ -81,5 +89,6 @@ help:
 	@echo "   make clean      : Cleans the built files"
 	@echo "   make install    : Installs the program into the system"
 	@echo "   make uninstall  : Uninstalls the program from the system"
+	@echo "   make doc        : Generates documentation in html"
 	@echo "   make help       : Displays this help text"
 
