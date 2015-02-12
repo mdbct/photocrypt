@@ -187,7 +187,7 @@ MatImage& MatImage::steg(const string& text, const string& key)
     if (key.empty())
         throw KeyEmptyError();
 
-    if (cols() < 110)
+    if (cols() < 50)
         throw InsufficientImageError();
 
     if (text.size() >= max())

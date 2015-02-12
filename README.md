@@ -1,8 +1,8 @@
 # Photocrypt
 
-A [steganography](http://en.wikipedia.org/wiki/Steganography) program that
-hides text in images. It has both a graphical ([gtkmm](http://gtkmm.org))
-and a command-line interface. It is written in C++.
+A [steganography][wiki-steganography] program that hides text in images. It has
+both a graphical ([gtkmm][gtkmm]) and a command-line interface. It is written
+in C++.
 
 It implements the Least Significant Bit (LSB) algorithm with SHA1 password
 protection. Every bit of secret data is stored in the LSBs of the image pixel
@@ -30,21 +30,20 @@ directory, and writes the hidden text in `stdout`.
 
 ## Dependencies
 
-- [GNU gcc](http://gcc.gnu.org): to compile
-- [GNU make](http://www.gnu.org/software/make): to build
-- [pkg-config](http://pkgconfig.freedesktop.org/wiki/): to link
-- [OpenCV](http://opencv.org) 2 library: for image processing
-- [gtkmm](http://gtkmm.org) 2.4 library: for GUI
-- [OpenSSL](http://openssl.org) library: for security
+- [GNU gcc][gcc]: to compile
+- [GNU make][make]: to build
+- [pkg-config][pkg-config]: to get compiler and linker flags
+- [OpenCV][opencv] 2 library: for image processing
+- [gtkmm][gtkmm] 2.4 library: for GUI
+- [OpenSSL][openssl] library: for security
 
 
 ## Installation
 
-#### Arch Linux
+### [Arch Linux][archlinux]
 
-[Photocrypt](https://aur.archlinux.org/packages/photocrypt-git)
-is available for [Arch Linux](https://archlinux.org) via
-[AUR](https://aur.archlinux.org):
+[Photocrypt][aur-photocrypt] is available for [Arch Linux][archlinux]
+via [AUR][aur]:
 
 ```bash
 yaourt photocrypt-git
@@ -52,19 +51,13 @@ yaourt photocrypt-git
 
 ### Manual installation
 
-To compile the program:
-
-```bash
-make [all]
-```
-
 To install to system:
 
 ```bash
 sudo make install
 ```
 
-To get the list of available make targets:
+To list available make targets:
 
 ```bash
 make help
@@ -92,3 +85,13 @@ redirect the output to file yourself):
 unsteg stego.png
 ```
 
+[wiki-steganography]: http://en.wikipedia.org/wiki/Steganography
+[gtkmm]:              http://gtkmm.org
+[aur]:                https://aur.archlinux.org
+[aur-photocrypt]:     https://aur.archlinux.org/packages/photocrypt-git
+[archlinux]:          https://archlinux.org
+[gcc]:                http://gcc.gnu.org
+[make]:               http://gnu.org/software/make
+[pkg-config]:         http://pkgconfig.freedesktop.org/wiki
+[opencv]:             http://opencv.org
+[openssl]:            http://openssl.org
