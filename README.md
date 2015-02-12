@@ -36,7 +36,6 @@ directory, and writes the hidden text in `stdout`.
 - [OpenCV](http://opencv.org) 2 library: for image processing
 - [gtkmm](http://gtkmm.org) 2.4 library: for GUI
 - [OpenSSL](http://openssl.org) library: for security
-- (Optional) [rsync](https://rsync.samba.org) tool: to install into system
 
 
 ## Installation
