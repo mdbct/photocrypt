@@ -42,6 +42,7 @@ unsteg: $(OBJECTS) $(ODIR)/unsteg.o
 
 $(ODIR)/%.o: %.cc $(HDIR)/*.h
 	@echo "Compiling $<"
+	@mkdir -p $(ODIR)
 	@$(CC) $(CFLAGS) $< -c -o $@
 
 install: uninstall all
@@ -68,7 +69,7 @@ clean-exe:
 
 clean-obj:
 	@echo "Cleaning objects"
-	@rm -f $(ODIR)/*.o
+	@rm -rf $(ODIR)
 
 help:
 	@echo "The Makefile defines the following target:"
