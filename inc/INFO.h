@@ -38,7 +38,7 @@ const Glib::ustring PROGRAM_WEBSITE_LABEL =
 
 /** A brief description of the program */
 const Glib::ustring PROGRAM_DESCRIPTION =
-    "A text-to-image steganography tool"
+    "A text-to-image steganography tool";
 
 /** A dummy copyright notice of the program */
 const Glib::ustring PROGRAM_COPYRIGHT =
