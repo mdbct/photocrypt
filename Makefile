@@ -24,39 +24,41 @@ vpath %.cc $(CDIR)
 
 ###################################################### Rules
 
-photocrypt: $(OBJECTS) $(ODIR)/main.o $(ODIR)/Win.o
-	@echo "Making $@"
-	@$(CC) $^ -o $@ $(LFLAGS)
+all: cli gui
 
 cli: steg unsteg
 
-all: photocrypt cli
+gui: photocrypt
+
+photocrypt: $(OBJECTS) $(ODIR)/main.o $(ODIR)/Win.o
+	@echo ":: Making $@"
+	@$(CC) $^ -o $@ $(LFLAGS)
 
 steg: $(OBJECTS) $(ODIR)/steg.o
-	@echo "Making $@"
+	@echo ":: Making $@"
 	@$(CC) $^ -o $@ $(LFLAGS)
 
 unsteg: $(OBJECTS) $(ODIR)/unsteg.o
-	@echo "Making $@"
+	@echo ":: Making $@"
 	@$(CC) $^ -o $@ $(LFLAGS)
 
 $(ODIR)/%.o: %.cc $(HDIR)/*.h
-	@echo "Compiling $<"
+	@echo ":: Compiling $<"
 	@mkdir -p $(ODIR)
 	@$(CC) $(CFLAGS) $< -c -o $@
 
 clean: clean-exe clean-obj clean-doc
 
 clean-exe:
-	@echo "Cleaning executables"
+	@echo ":: Cleaning executables"
 	@rm -f photocrypt steg unsteg
 
 clean-obj:
-	@echo "Cleaning objects"
+	@echo ":: Cleaning objects"
 	@rm -rf $(ODIR)
 
 install: uninstall all
-	@echo "Installing"
+	@echo ":: Installing"
 	@mkdir -p "$(DESTDIR)/opt/photocrypt"
 	@mkdir -p "$(DESTDIR)/usr/bin"
 	@cp photocrypt steg unsteg README.md icon.png $(DESTDIR)/opt/photocrypt/
@@ -65,7 +67,7 @@ install: uninstall all
 	@ln -s /opt/photocrypt/unsteg     $(DESTDIR)/usr/bin/unsteg
 
 uninstall:
-	@echo "Uninstalling"
+	@echo ":: Uninstalling"
 	@rm -rf $(DESTDIR)/opt/photocrypt
 	@rm -f $(DESTDIR)/usr/bin/photocrypt
 	@rm -f $(DESTDIR)/usr/bin/steg
@@ -73,19 +75,17 @@ uninstall:
 
 doc: $(HDIR)/* $(CDIR)/* README.md Doxyfile
 	@doxygen 1>/dev/null 2>&1
-	@echo "Documentation generated in \`doc\` directory."
+	@echo ":: Documentation generated in \`doc\` directory."
 
 clean-doc:
-	@echo "Cleaning docs"
+	@echo ":: Cleaning docs"
 	@rm -rf doc
 
 help:
 	@echo "The Makefile defines the following target:"
 	@echo "   make            : Builds the GUI program"
 	@echo "   make cli        : Builds the CLI programs (steg & unsteg)"
-	@echo "   make steg       : Builds the CLI steg program"
-	@echo "   make unsteg     : Builds the CLI unsteg program"
-	@echo "   make all        : Builds everything"
+	@echo "   make gui        : Builds the GUI program (photocrypt)"
 	@echo "   make clean      : Cleans the built files"
 	@echo "   make install    : Installs the program into the system"
 	@echo "   make uninstall  : Uninstalls the program from the system"

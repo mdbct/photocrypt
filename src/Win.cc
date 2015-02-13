@@ -17,7 +17,7 @@ using Glib::ustring;
 using sigc::mem_fun;
 using sigc::bind;
 using std::string;
-using util::to_str;
+using std::to_string;
 using Gdk::Pixbuf;
 
 // Default constructor for our main window
@@ -252,7 +252,7 @@ void Win::onOpenImage()
         string filename = d.get_filename();
         mMatImage = filename;
         mImage.set(mMatImage.fit(mImage.get_width(), mImage.get_height()));
-        string label = "Capacity: " + to_str(mMatImage.max()) + " Bytes";
+        string label = "Capacity: " + to_string(mMatImage.max()) + " Bytes";
         mLabelImage.set_label(label);
     }
 }
@@ -406,7 +406,7 @@ void Win::unsteg()
 void Win::onTextBufferChange()
 {
     int size = (mrTextBuffer -> get_text()).size();
-    string label = "Size: " + to_str(size) + " Bytes";
+    string label = "Size: " + to_string(size) + " Bytes";
     mLabelText.set_label(label);
 }
 

@@ -36,15 +36,6 @@ void setbit(unsigned char& p, const int bit, const int index = 0);
  */
 int  getbit(const unsigned char& p, const int index = 0);
 
-
-/** Converts a number to string
- *
- * @param number    A number to be converted
- *
- * @return  The @a number as a `std::string` object
- */
-std::string to_str(double number);   
-
 /** Displays an error message and quits program
  *
  * @param msg          The error message to display
