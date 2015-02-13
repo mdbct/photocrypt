@@ -46,12 +46,6 @@ struct InsufficientImageError : public Error
     InsufficientImageError(const std::string& msg = "");
 };
 
-/** The exception thrown when one tries to unsteg a non-stego image */
-struct ImageNotStegoError : public Error
-{
-    ImageNotStegoError(const std::string& msg = "");
-};
-
 /** The exception thrown when one tries to unsteg with incorrect password */
 struct KeyMismatchError : public Error
 {

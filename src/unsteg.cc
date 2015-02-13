@@ -39,10 +39,6 @@ int main(int argc, char** argv)
     {
         error("ERROR: Not a proper image.");
     }
-    catch (ImageNotStegoError)
-    {
-        error("ERROR: Image is not stego.");
-    }
     catch (KeyEmptyError)
     {
         error("ERROR: Password is empty.");

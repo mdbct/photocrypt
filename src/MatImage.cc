@@ -112,14 +112,6 @@ bool MatImage::empty() const
     return mMat.empty();
 }
 
-/*
-bool MatImage::is_stego() const
-{
-    return (hash().size() == 40);
-}
-*/
-
-
 // Convert to a Pixbuf
 RefPtr<Pixbuf> MatImage::pixbuf() const
 {
@@ -206,11 +198,6 @@ string MatImage::unsteg(const string& key) const
 
     if (mMat.empty())
         throw ImageEmptyError();
-
-    /*
-    if (not is_stego())
-       throw ImageNotStegoError();
-    */
 
     if (sha(key) != hash(key))
         throw KeyMismatchError();
@@ -310,10 +297,6 @@ void MatImage::conceal(const string& text, const string& key)
 // Reveal the hidden text
 string MatImage::reveal(const string& key) const
 {
-    /*
-    if (not is_stego())
-        throw ImageNotStegoError();
-        */
     string text;
     vector<int> ignore[3];
     auto kit = key.begin();
@@ -358,7 +341,7 @@ string MatImage::hash(const string& key) const
     vector<int> ignore[3];
     auto kit = key.begin();
 
-    for (auto mit = mMat.begin<Vec3b>(); /*hash.size() != 40*/; ++mit) {
+    for (auto mit = mMat.begin<Vec3b>(); ; ++mit) {
 
         // Get ignore bits
         for (int i = 0; i < 3; ++i) {

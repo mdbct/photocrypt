@@ -380,11 +380,6 @@ void Win::unsteg()
         display_error("Select an image first.");
         return;
     }
-    catch (ImageNotStegoError)
-    {
-        display_error("The selected image is not a stego-image.");
-        return;
-    }
     catch (KeyEmptyError)
     {
         display_error("You must enter a password.");

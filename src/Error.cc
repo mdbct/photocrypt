@@ -19,6 +19,4 @@ KeyEmptyError::KeyEmptyError(const string& msg)                   : Error(msg) {
 
 InsufficientImageError::InsufficientImageError(const string& msg) : Error(msg) {}
 
-ImageNotStegoError::ImageNotStegoError(const string& msg)         : Error(msg) {}
-
 KeyMismatchError::KeyMismatchError(const string& msg)             : Error(msg) {}
