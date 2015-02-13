@@ -54,6 +54,7 @@ via [AUR][aur]:
 
 To install to system:
 
+    make
     sudo make install
 
 To list available make targets:

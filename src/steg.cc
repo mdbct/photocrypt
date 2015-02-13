@@ -9,10 +9,8 @@
 #include "MatImage.h"
 #include "TextFile.h"
 #include "Error.h"
-#include "util.h"
 #include "INFO.h"
 using namespace std;
-using namespace util;
 using namespace INFO;
 
 // Helper functions

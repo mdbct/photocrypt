@@ -10,13 +10,11 @@
 #include "Error.h"
 #include "INFO.h"
 using namespace std;
-using namespace util;
 using namespace INFO;
 
 // Helper functions
 void print_help();
 void print_version();
-
 
 //==================== main() ===================================================
 int main(int argc, char** argv)
@@ -121,7 +119,6 @@ void print_version()
 }
 
 //======================== print_help() =======================================
-void print_version()
 void print_help()
 {
     print_version();
