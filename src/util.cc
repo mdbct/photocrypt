@@ -5,7 +5,6 @@
 #include <sstream>
 #include <openssl/sha.h>
 #include <cassert>
-#include <cstdlib>
 #include <iomanip>
 #include <iostream>
 #include <stdexcept>
@@ -74,12 +73,4 @@ int util::getbit(const uchar& p, const int index)
     int isSet = p & (1 << index);
 
     return (isSet) ? 1 : 0;
-}
-
-
-// Display an error and quit
-void util::error(const string& msg, int return_value)
-{
-    cerr << msg << endl;
-    exit(return_value);
 }

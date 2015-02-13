@@ -20,9 +20,10 @@ TextFile TextFile::open(const string& filename)
 
     ifstream file(filename.c_str());
 
-    char c;
-    while (file.get(c))
-        t.mText.push_back(c);
+    string line;
+    getline(file, t.mText);
+    while (getline(file, line))
+        t.mText += "\n" + line;
 
     return t;
 }

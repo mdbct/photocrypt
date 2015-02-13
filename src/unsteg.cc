@@ -1,52 +1,142 @@
 /** @file
- *  This file is a simple test program that tests the decryption of data
- *  from a stego-image. (ie. it tests the `unsteg()` method.)
  *
- *  Also, see the `steg.cc` file, which tests the encryption part.
+ * This is the photocrypt decrypter.
  */
 #include <iostream>
 #include <string>
+#include <getopt.h>
 #include "MatImage.h"
-#include <cassert>
-#include "util.h"
+#include "TextFile.h"
 #include "Error.h"
-
+#include "INFO.h"
 using namespace std;
 using namespace util;
+using namespace INFO;
 
+// Helper functions
+void print_help();
+void print_version();
+
+
+//==================== main() ===================================================
 int main(int argc, char** argv)
 {
-    if (argc != 2)
-        error("USAGE: " + string(argv[0]) + " <stego-image>");
-
-    // Get the string constants
-    string stego_filename = argv[1];
-    string key;
-
-    // Open the files
-    MatImage I = stego_filename;
-
-    // Ask for password
-    cerr << "Enter the password: ";
-    cin >> key;
-
+    // Declare necessary strings
+    string image_filename;
     string text;
+    string key;
+    string out_filename;
+
+    // Parse command-line options
+    int option_index = 0;
+    option long_options[] = {
+        {"help",      no_argument,       0, 'h'},
+        {"password",  required_argument, 0, 'p'},
+        {"out-file",  required_argument, 0, 'o'},
+        {"version",   no_argument,       0, 'V'},
+        {0,0,0,0}
+    };
+
+    while (true) {
+        int c = getopt_long(argc, argv, ":hVp:o:", long_options, &option_index);
+
+        if (c == -1) break;
+
+        switch (c) {
+            case 'h':
+                print_help();
+                return 0;
+
+            case 'V':
+                print_version();
+                return 0;
+
+            case 'p':
+                key = string(optarg);
+                break;
+
+            case 'o':
+                out_filename = string(optarg);
+                break;
+
+            case ':':
+                error("Missing option argument");
+
+            case '?':
+                error("Unknown option");
+
+            default:
+                error("Unknown error");
+        }
+    }
+
+    if ( (argc - optind) != 1 ) {
+        print_help();
+        return 1;
+    }
+
+    // Open the image
+    image_filename = string(argv[optind++]);
+    MatImage I;
     try
     {
-        text = I.unsteg(key);
+        I = image_filename;
     }
-    catch (ImageEmptyError)
+    catch (const IOError& e)
     {
-        error("ERROR: Not a proper image.");
-    }
-    catch (KeyEmptyError)
-    {
-        error("ERROR: Password is empty.");
-    }
-    catch (KeyMismatchError)
-    {
-        error("ERROR: Password incorrect.");
+        error(e);
     }
 
-    cout << text << endl;
+    // Get the password
+    if (key.empty()) {
+        cout << ":: Password: ";
+        getline(cin, key);
+    }
+
+    // Unsteg
+    TextFile file;
+    try
+    {
+        file = I.unsteg(key);
+
+        if (out_filename.empty()) {
+            cout << file << endl;
+        } else {
+            file.save(out_filename);
+            cout << ":: Hidden text extracted to '" << out_filename <<"'" << endl;
+        }
+    }
+    catch (const exception& e)
+    {
+        error(e);
+    }
+
+    return 0;
+}
+
+//======================== print_version() ====================================
+void print_version()
+{
+    cout << "unsteg " << PROGRAM_VERSION << endl;
+}
+
+//======================== print_help() =======================================
+void print_version()
+void print_help()
+{
+    print_version();
+    cout <<
+        "\n"
+        "A text-to-image steganography tool (decrypter). This tool is a part of\n"
+        "the Photocrypt project.\n"
+        "\n"
+        "USAGE:\n"
+        "  unsteg [OPTION...] IMAGE-FILE\n"
+        "\n"
+        "OPTIONS:\n"
+        "  -h, --help             display this help message\n"
+        "  -p, --password=PASSWD  password to decrypt\n"
+        "  -o, --out-file=FILE    output filename\n"
+        "  -V, --version          display the program version number\n"
+        << endl;
 }

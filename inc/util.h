@@ -36,13 +36,6 @@ void setbit(unsigned char& p, const int bit, const int index = 0);
  */
 int  getbit(const unsigned char& p, const int index = 0);
 
-/** Displays an error message and quits program
- *
- * @param msg          The error message to display
- * @param return_value The value to return when quitting
- */
-void error(const std::string& msg, int return_value = 1);
-
 } // namespace util
 
 #endif // UTIL_H

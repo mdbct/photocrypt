@@ -26,6 +26,10 @@ MatImage::MatImage()
 MatImage::MatImage(const string& filename)
 {
     mMat = imread(filename, CV_LOAD_IMAGE_COLOR);
+
+    if (not mMat.data)
+        throw IOError("Couldn't open image file");
+
     cvtColor(mMat, mMat, CV_BGR2RGB);
 }
 
@@ -180,10 +184,10 @@ MatImage& MatImage::steg(const string& text, const string& key)
         throw KeyEmptyError();
 
     if (cols() < 50)
-        throw InsufficientImageError();
+        throw InsufficientImageError("Image is too small");
 
     if (text.size() >= max())
-        throw InsufficientImageError();
+        throw InsufficientImageError("Text is too large for this image");
 
     set_key(key);
     conceal(text, key);
@@ -212,7 +216,7 @@ string MatImage::unsteg(const string& key) const
 void MatImage::set_key(const string& key)
 {
     if (key.empty())
-        throw KeyEmptyError();
+        throw KeyEmptyError("Key is empty");
 
     string hash = sha(key);
     assert(hash.size() == 40);

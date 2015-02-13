@@ -17,7 +17,7 @@ const Glib::ustring PROGRAM_TITLE =
 
 /** Current version of the program */
 const Glib::ustring PROGRAM_VERSION =
-    "0.2";
+    "0.3";
 
 /** Array of project team members */
 const Glib::ustring _a[3] = {
@@ -38,7 +38,7 @@ const Glib::ustring PROGRAM_WEBSITE_LABEL =
 
 /** A brief description of the program */
 const Glib::ustring PROGRAM_DESCRIPTION =
-    "A steganography application that can hide text in image";
+    "A text-to-image steganography tool"
 
 /** A dummy copyright notice of the program */
 const Glib::ustring PROGRAM_COPYRIGHT =

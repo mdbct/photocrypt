@@ -25,9 +25,6 @@ The algorithm used in this program can be explained briefly as:
 JPEG compression algorithm modifies some pixels to reduce file size and quality.
 </blockquote>
 
-The CLI programs writes the stego-image in `out.png` file in the current
-directory, and writes the hidden text in `stdout` (which can be redirected).
-
 
 ## Dependencies
 
@@ -69,15 +66,17 @@ To open the GUI frontend, run:
 
     photocrypt
 
-Or if you are a terminal-lover like me, here's how you can hide a text file
-`secret.txt` in an image `image.jpg`:
+But if you're a terminal-person like me, you can use the CLI front-ends (`steg`
+and `unsteg`) which are equally (probably more?) powerful. For example, to hide
+the contents of `text.txt` in `image.jpg`:
 
-    steg image.jpg secret.txt
+    steg image.jpg -f text.txt
 
-Similarly, to view the text hidden in a stego-image `stego.png` (You can then
-redirect the output to file yourself):
+Similarly, to decrypt the text hidden in `stego.png`:
 
     unsteg stego.png
+
+For more info, see `steg -h` and `unsteg -h`.
 
 
 [wiki-steganography]: http://en.wikipedia.org/wiki/Steganography

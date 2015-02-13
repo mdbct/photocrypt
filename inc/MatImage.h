@@ -52,7 +52,6 @@ public:
     uint8_t* data()     const; ///< Returns the pointer to the pixel array
     long     max()      const; ///< Returns the maximum size of text this image can hide
     bool     empty()    const; ///< Checks if image is empty
-    //bool     is_stego() const; ///< Checks if image is a stego-image
 
     /** Converts the image into a `Gdk::Pixbuf` object.
      *  
