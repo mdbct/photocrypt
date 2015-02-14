@@ -42,7 +42,7 @@ const Glib::ustring PROGRAM_DESCRIPTION =
 
 /** A dummy copyright notice of the program */
 const Glib::ustring PROGRAM_COPYRIGHT =
-    "© 2015. MDBCT";
+    "(c) 2015. MDBCT";
 
 /** The licence text of the program */
 const Glib::ustring PROGRAM_LICENSE = 

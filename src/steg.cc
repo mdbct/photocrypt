@@ -13,6 +13,9 @@
 using namespace std;
 using namespace INFO;
 
+// Global variables
+string PROGRAM = "steg";
+
 // Helper functions
 void print_help();
 void print_version();
@@ -121,24 +124,24 @@ int main(int argc, char** argv)
     return 0;
 }
 
-//========================= print_version() ==========================================
+//========================= print_version() ===================================
 void print_version()
 {
-    cout << "steg " << PROGRAM_VERSION << endl;
+    cout << PROGRAM_VERSION << endl;
 }
 
-//========================= print_help() ==========================================
+//========================= print_help() ======================================
 void print_help()
 {
     print_version();
-    cout << 
-        "\n"
-        "A text-to-image steganography tool (encrypter). This tool is part of\n"
-        "the Photocrypt project.\n"
-        "\n"
+    cout << endl <<
+        PROGRAM_DESCRIPTION << " (encrypter)\n";
+
+    cout << endl <<
         "USAGE:\n"
-        "  steg [OPTION...] IMAGE-FILE\n"
-        "\n"
+        "  " << PROGRAM << " [OPTION...] IMAGE-FILE\n";
+
+    cout << endl <<
         "OPTIONS:\n"
         "  -h, --help             display this help message\n"
         "  -f, --text-file=FILE   set the text file to encrypt\n"
@@ -146,6 +149,16 @@ void print_help()
         "  -o, --out-file=FILE    set the output stego-image filename\n"
         "  -V, --version          display the program version number\n"
         "\n"
-        "If a text file is not provided by options, the program will take\n"
-        "the text from STDIN." << endl;
+        "  If a text file is not provided by options, the program will take\n"
+        "  the text from STDIN.\n";
+
+    cout << endl <<
+        "AUTHORS:\n";
+    for (auto author : PROGRAM_AUTHORS)
+        cout << "  " << author << endl;
+
+    cout << endl <<
+        "This tool is a part of the Photocrypt project.\n" <<
+        PROGRAM_WEBSITE << endl <<
+        PROGRAM_COPYRIGHT << endl;
 }

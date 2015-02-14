@@ -12,6 +12,9 @@
 using namespace std;
 using namespace INFO;
 
+// Global variables
+const string PROGRAM = "unsteg";
+
 // Helper functions
 void print_help();
 void print_version();
@@ -115,25 +118,34 @@ int main(int argc, char** argv)
 //======================== print_version() ====================================
 void print_version()
 {
-    cout << "unsteg " << PROGRAM_VERSION << endl;
+    cout << PROGRAM_VERSION << endl;
 }
 
 //======================== print_help() =======================================
 void print_help()
 {
     print_version();
-    cout <<
-        "\n"
-        "A text-to-image steganography tool (decrypter). This tool is a part of\n"
-        "the Photocrypt project.\n"
-        "\n"
+    cout << endl <<
+        PROGRAM_DESCRIPTION << " (decrypter)" << endl;
+
+    cout << "\n"
         "USAGE:\n"
-        "  unsteg [OPTION...] IMAGE-FILE\n"
-        "\n"
+        "  " << PROGRAM << " [OPTION...] IMAGE-FILE\n";
+
+    cout << "\n"
         "OPTIONS:\n"
-        "  -h, --help             display this help message\n"
-        "  -p, --password=PASSWD  password to decrypt\n"
-        "  -o, --out-file=FILE    output filename\n"
-        "  -V, --version          display the program version number\n"
-        << endl;
+        "  -h, --help               display this help message\n"
+        "  -p, --password=PASSWD    password to decrypt\n"
+        "  -o, --out-file=FILE      output filename\n"
+        "  -V, --version            display the program version number\n";
+
+    cout << "\n"
+        "AUTHORS:\n";
+    for (auto author : PROGRAM_AUTHORS)
+        cout << "  " << author << endl;
+
+    cout << endl <<
+        "This tool is a part of the Photocrypt project\n" <<
+        PROGRAM_WEBSITE << endl <<
+        PROGRAM_COPYRIGHT << endl;
 }
