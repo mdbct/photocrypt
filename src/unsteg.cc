@@ -124,7 +124,7 @@ void print_version()
 //======================== print_help() =======================================
 void print_help()
 {
-    print_version();
+    cout << PROGRAM << " " << PROGRAM_VERSION << endl;
     cout << endl <<
         PROGRAM_DESCRIPTION << " (decrypter)" << endl;
 
