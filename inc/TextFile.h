@@ -7,6 +7,8 @@
 #include <string>
 #include <iostream>
 
+namespace Photocrypt
+{
 
 /**
  *  This class represents a text file buffer.
@@ -55,5 +57,6 @@ private:
     std::string mText; /**< Holds the contents of the text file */
 };
 
+} // namespace Photocrypt
 
 #endif // TEXTFILE_H

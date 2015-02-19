@@ -11,7 +11,7 @@
 #include "Error.h"
 #include "INFO.h"
 using namespace std;
-using namespace INFO;
+using namespace Photocrypt;
 
 // Global variables
 string PROGRAM = "steg";
@@ -111,13 +111,10 @@ int main(int argc, char** argv)
     }
 
     // Steg
-    try
-    {
+    try {
         I.steg(text, key).save(stego_filename);
         cout << ":: Stego-image saved as '" << stego_filename << "'" << endl;
-    }
-    catch (const exception& e)
-    {
+    } catch (const exception& e) {
         error(e);
     }
 

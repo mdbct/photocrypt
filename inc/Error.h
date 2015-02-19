@@ -11,6 +11,9 @@
 #include <stdexcept>
 #include <exception>
 
+namespace Photocrypt
+{
+
 /** A base class for exceptions in our project */
 struct Error : public std::runtime_error
 {
@@ -67,5 +70,7 @@ void error(const std::string& error_msg = "There has been an error", int ret = -
  * @param ret   The return value
  */
 void error(const std::exception& e, int ret = -1);
+
+} // namespace Photocrypt
 
 #endif // ERROR_H

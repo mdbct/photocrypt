@@ -5,8 +5,8 @@
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = "Photocrypt"
-PROJECT_NUMBER         = "0.3"
-PROJECT_BRIEF          = "A steganography application that can hide text in image"
+PROJECT_NUMBER         = "0.4"
+PROJECT_BRIEF          = "A text-to-image steganography tool"
 PROJECT_LOGO           =
 OUTPUT_DIRECTORY       =
 CREATE_SUBDIRS         = NO

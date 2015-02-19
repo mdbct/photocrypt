@@ -8,14 +8,18 @@
 #include "util.h"
 #include <string>
 #include "Error.h"
+#include <iostream>
 
 using namespace cv;
 using namespace std;
-using namespace util;
 using Glib::RefPtr;
 using Gdk::Pixbuf;
 
-typedef uint8_t byte;
+using byte = uint8_t;
+using uint = unsigned int;
+
+namespace Photocrypt
+{
 
 // Default constructor
 MatImage::MatImage()
@@ -108,7 +112,7 @@ byte* MatImage::data() const
 
 long MatImage::max() const
 {
-    return (cols() * (rows() - 1));
+    return (cols() * (rows() - 1)) / 3;
 }
 
 bool MatImage::empty() const
@@ -174,7 +178,7 @@ void  MatImage::show(int msecs) const
 // Steg
 MatImage& MatImage::steg(const string& text, const string& key)
 {
-    if (mMat.empty())
+    if (empty())
         throw ImageEmptyError();
 
     if (text.empty())
@@ -183,7 +187,7 @@ MatImage& MatImage::steg(const string& text, const string& key)
     if (key.empty())
         throw KeyEmptyError();
 
-    if (cols() < 50)
+    if (cols() < 80)
         throw InsufficientImageError("Image is too small");
 
     if (text.size() >= max())
@@ -198,10 +202,13 @@ MatImage& MatImage::steg(const string& text, const string& key)
 // Unsteg
 string MatImage::unsteg(const string& key) const
 {
-    assert(sha(key).size() == 40);
+    assert(sha(key).size() == 20);
 
-    if (mMat.empty())
+    if (empty())
         throw ImageEmptyError();
+
+    if (cols() < 80)
+        throw InsufficientImageError("Image is not stego");
 
     if (sha(key) != hash(key))
         throw KeyMismatchError();
@@ -219,36 +226,26 @@ void MatImage::set_key(const string& key)
         throw KeyEmptyError("Key is empty");
 
     string hash = sha(key);
-    assert(hash.size() == 40);
+    assert(hash.size() == 20);
     hash.push_back(0);
 
     auto kit = key.begin();
-    vector<int> ignore[3];
 
     auto mit = mMat.begin<Vec3b>();
-    for (auto hit = hash.begin(); hit != hash.end(); ++hit, ++mit)
+    for (auto hit = hash.begin(); hit != hash.end(); ++hit)
     {
-        // Get ignore bits
-        for (int i = 0; i < 3; ++i) {
-            int kval = static_cast<int>(*kit);
-
-            ignore[i] = { kval % 4 };
-            if (i == 2) ignore[i].push_back( (kval+1) % 4 );
-
-            kit++;
-            if (kit == key.end()) kit = key.begin();
-        }
+        // Get ignore bit
+        int ignore = static_cast<uint>(*(kit++)) % 8;
+        if (kit == key.end()) kit = key.begin();
 
         // Set bits
         uchar c = static_cast<uchar>(*hit);
-        int   b = 0;
-        
-        for (int clr = 0; clr < 3; ++clr) {
-            for (int i = 0; i < 4; ++i) {
-                auto pos = find( ignore[clr].begin(), ignore[clr].end(), i );
-                if (pos == ignore[clr].end()) {
-                    setbit( (*mit)[clr], getbit(c, b++), i );
-                }
+        int i = 0, b = 0;
+
+        for (int px = 0; px < 3; ++px, ++mit) {
+            for (int color = 0; color < 3; ++color, ++i) {
+                if (i != ignore)
+                    setbit( (*mit)[color], getbit(c, b++) );
             }
         }
     }
@@ -267,31 +264,23 @@ void MatImage::conceal(const string& text, const string& key)
     auto txt = text;
     txt.push_back(0);
 
-    vector<int> ignore[3];
     auto kit = key.begin();
 
-    for (auto tit = txt.begin(); tit != txt.end(); ++tit, ++mit) {
+    for (auto tit = txt.begin(); tit != txt.end(); ++tit) {
 
         // Get ignore bits
-        for (int i = 0; i < 3; ++i) {
-            int kval = static_cast<int>(*kit);
-
-            ignore[i] = { kval % 4 };
-            if (i == 2) ignore[i].push_back( (kval+1) % 4 );
-
-            kit++;
-            if (kit == key.end()) kit = key.begin();
-        }
+        int ignore = static_cast<uint>(*(kit++)) % 8;
+        if (kit == key.end()) kit = key.begin();
+        cout << ignore << endl;
 
         // Set bits
         uchar c = static_cast<uchar>(*tit);
-        int   b = 0;
-        
-        for (int clr = 0; clr < 3; ++clr) {
-            for (int i = 0; i < 4; ++i) {
-                auto pos = find( ignore[clr].begin(), ignore[clr].end(), i );
-                if (pos == ignore[clr].end()) {
-                    setbit( (*mit)[clr], getbit(c, b++), i );
+        int i = 0, b = 0;
+
+        for (int px = 0; px < 3; ++px, ++mit) {
+            for (int color = 0; color < 3; ++color, ++i) {
+                if (i != ignore) {
+                    setbit( (*mit)[color], getbit(c, b++) );
                 }
             }
         }
@@ -302,32 +291,22 @@ void MatImage::conceal(const string& text, const string& key)
 string MatImage::reveal(const string& key) const
 {
     string text;
-    vector<int> ignore[3];
     auto kit = key.begin();
 
-    for (auto mit = mMat.begin<Vec3b>() + cols(); ; ++mit) {
+    for (auto mit = mMat.begin<Vec3b>() + cols(); ;) {
 
         // Get ignore bits
-        for (int i = 0; i < 3; ++i) {
-            int kval = static_cast<int>(*kit);
-
-            ignore[i] = { kval % 4 };
-            if (i == 2) ignore[i].push_back( (kval+1) % 4 );
-
-            kit++;
-            if (kit == key.end()) kit = key.begin();
-        }
+        int ignore = static_cast<uint>(*(kit++)) % 8;
+        if (kit == key.end()) kit = key.begin();
 
         // Set bits
         uchar c;
-        int b = 0;
+        int b = 0, i = 0;
 
-        for (int clr = 0; clr < 3; ++clr) {
-            for (int i = 0; i < 4; ++i) {
-                auto pos = find( ignore[clr].begin(), ignore[clr].end(), i );
-                if (pos == ignore[clr].end()) {
-                    setbit( c, getbit( (*mit)[clr], i), b++ );
-                }
+        for (int px = 0; px < 3; ++px, ++mit) {
+            for (int color = 0; color < 3; ++color, ++i) {
+                if (i != ignore)
+                    setbit( c, getbit((*mit)[color]), b++);
             }
         }
 
@@ -342,32 +321,25 @@ string MatImage::reveal(const string& key) const
 string MatImage::hash(const string& key) const
 {
     string hash;
-    vector<int> ignore[3];
     auto kit = key.begin();
 
-    for (auto mit = mMat.begin<Vec3b>(); ; ++mit) {
+    for (auto mit = mMat.begin<Vec3b>(); ;) {
 
         // Get ignore bits
-        for (int i = 0; i < 3; ++i) {
-            int kval = static_cast<int>(*kit);
-
-            ignore[i] = { kval % 4 };
-            if (i == 2) ignore[i].push_back( (kval+1) % 4 );
-
-            kit++;
-            if (kit == key.end()) kit = key.begin();
-        }
+        int ignore = static_cast<uint>(*(kit++)) % 8;
+        if (kit == key.end()) kit = key.begin();
 
         // Set bits
         uchar c;
-        int b = 0;
+        int b = 0, i = 0;
 
-        for (int clr = 0; clr < 3; ++clr) {
-            for (int i = 0; i < 4; ++i) {
-                auto pos = find( ignore[clr].begin(), ignore[clr].end(), i );
-                if (pos == ignore[clr].end()) {
-                    setbit( c, getbit( (*mit)[clr], i), b++ );
-                }
+        // Iterate over 3 pixels for each byte
+        for (int px = 0; px < 3; ++px, ++mit) {
+
+            // Iterator over 3 colors for each pixel
+            for (int color = 0; color < 3; ++color, ++i) {
+                if (i != ignore)
+                    setbit( c, getbit((*mit)[color]), b++ );
             }
         }
 
@@ -377,3 +349,5 @@ string MatImage::hash(const string& key) const
 
     return hash;
 }
+
+} // namespace Photocrypt

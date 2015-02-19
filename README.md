@@ -12,9 +12,9 @@ data without the key.
 
 The algorithm used in this program can be explained briefly as:
 
-* The 1st row of image is used to store the 40-byte SHA1 hash string of the
-  password. The bits used to hide the data depends on the key itself. This is
-  required to add password-verification feature.
+* The 1st row of image is used to store the SHA1 digest of the password. The
+  bits used to hide the data depends on the key itself. This is required to add
+  password-verification feature.
 
 * The secret data starts from the beginning of the 2nd row. The bits used to
   hide the data depends on the key itself. The value `\0` is appened at last to

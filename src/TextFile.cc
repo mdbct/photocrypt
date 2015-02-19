@@ -4,8 +4,10 @@
  */
 #include "TextFile.h"
 #include <fstream>
-
 using namespace std;
+
+namespace Photocrypt
+{
 
 // Constructor
 TextFile::TextFile(const string& str) : mText(str) { }
@@ -86,3 +88,5 @@ TextFile& TextFile::operator+=(const TextFile& textFile)
 {
     return this->append(textFile.str());
 }
+
+} // namespace Photocrypt

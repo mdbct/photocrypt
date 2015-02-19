@@ -104,8 +104,8 @@ protected:
     Gtk::Button mButtonSteg;
     Gtk::Button mButtonSave;
 
-    MatImage mMatImage;
-    TextFile mTextFile;
+    Photocrypt::MatImage mMatImage;
+    Photocrypt::TextFile mTextFile;
 
     bool mSized;
     sigc::connection mConnection;

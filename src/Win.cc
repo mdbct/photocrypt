@@ -11,7 +11,7 @@
 #include "Error.h"
 
 using namespace Gtk;
-using namespace INFO;
+using namespace Photocrypt;
 using Glib::RefPtr;
 using Glib::ustring;
 using sigc::mem_fun;

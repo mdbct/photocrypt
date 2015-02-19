@@ -9,6 +9,9 @@
 #include "Error.h"
 using namespace std;
 
+namespace Photocrypt
+{
+
 Error::Error(const string& msg) : runtime_error(msg) {}
 
 ImageEmptyError::ImageEmptyError(const string& msg) : Error(msg) {}
@@ -37,3 +40,5 @@ void error(const exception& e, int ret)
 {
     error(e.what(), ret);
 }
+
+} // namespace Photocrypt

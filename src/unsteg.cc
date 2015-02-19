@@ -10,7 +10,7 @@
 #include "Error.h"
 #include "INFO.h"
 using namespace std;
-using namespace INFO;
+using namespace Photocrypt;
 
 // Global variables
 const string PROGRAM = "unsteg";

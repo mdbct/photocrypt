@@ -1,4 +1,5 @@
 /** @file
+ *
  *  This file defines the utlity function declared in `util.h` file.
  */
 #include "util.h"
@@ -8,13 +9,15 @@
 #include <iomanip>
 #include <iostream>
 #include <stdexcept>
-
-typedef unsigned char uchar;
-
 using namespace std;
 
-// Returns a SHA1-hashed string of the given string.
-string util::sha(const string& in)
+using uchar = unsigned char;
+
+namespace Photocrypt
+{
+
+// Returns a SHA1 digest of the given string.
+string sha(const string& in)
 {
     uchar temp[SHA_DIGEST_LENGTH]; // SHA_DIGEST_LENGTH = 20 bytes
 
@@ -22,6 +25,11 @@ string util::sha(const string& in)
     // See 'man 3 sha' for details.
     SHA1((uchar*) in.c_str(), in.size(), temp);
 
+    string s;
+    for (int i = 0; i < SHA_DIGEST_LENGTH; ++i)
+        s.push_back(temp[i]);
+    return s;
+    /*
     // We'll be writing the output string to a stringstream;
     ostringstream o;
 
@@ -32,22 +40,22 @@ string util::sha(const string& in)
         if (temp[i] <= 0xF)
             o << "0";
 
-        o << hex << (int) temp[i];
+        o << hex << static_cast<int>(temp[i]);
     }
 
-    assert(o.str().size() == 2 * SHA_DIGEST_LENGTH);
     return o.str();
+    */
 }
 
 
 // Sets a bit.
-void util::setbit(uchar& p, const int bit, const int index)
+void setbit(uchar& p, const int bit, const int index)
 {
     if (bit < 0 or bit > 1)
-        throw out_of_range("Bit should be either 0 or 1.");
+        throw out_of_range("Bit should be either 0 or 1");
 
     if (index < 0 or index > 7)
-        throw out_of_range("Index is out of range.");
+        throw out_of_range("Index is out of range while setting bit");
 
     switch (bit)
     {
@@ -65,12 +73,14 @@ void util::setbit(uchar& p, const int bit, const int index)
 }
 
 // Get a bit.
-int util::getbit(const uchar& p, const int index)
+int getbit(const uchar& p, const int index)
 {
     if (index < 0 or index > 7)
-        throw out_of_range("Index is out of range.");
+        throw out_of_range("Index is out of range while getting bit");
 
     int isSet = p & (1 << index);
 
     return (isSet) ? 1 : 0;
 }
+
+} // namespace Photocrypt

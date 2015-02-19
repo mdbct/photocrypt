@@ -7,8 +7,7 @@
 #include <vector>
 #include <gtkmm.h>
 
-/** This namespace holds some global informations about the program */
-namespace INFO
+namespace Photocrypt
 {
 
 /** The name of the program */
@@ -17,7 +16,7 @@ const Glib::ustring PROGRAM_TITLE =
 
 /** Current version of the program */
 const Glib::ustring PROGRAM_VERSION =
-    "0.3";
+    "0.4";
 
 /** Array of project team members */
 const Glib::ustring _a[3] = {

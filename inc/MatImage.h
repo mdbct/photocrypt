@@ -13,6 +13,9 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <gtkmm.h>
 
+namespace Photocrypt
+{
+
 /**
  *  The class that represents an image that can hide text within it.
  */
@@ -124,5 +127,7 @@ private:
     /** Returns the text hidden in the image */
     std::string reveal(const std::string& key) const;
 };
+
+} // namespace Photocrypt
 
 #endif // MATIMAGE_H

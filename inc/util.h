@@ -6,15 +6,15 @@
 
 #include <string>
 
-/** All the utility functions are declared inside this namespace */
-namespace util
+/** Namespace for the "Photocrypt" project */
+namespace Photocrypt
 {
 
 /** Returns the SHA1-hashed string of the given string
  *
  * @param   in  The string to be hashed
  *
- * @return  The hashed hex string of @a in
+ * @return  The hashed string of @a in
  */
 std::string sha(const std::string& in);
 
