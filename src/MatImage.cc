@@ -1,4 +1,5 @@
 /** @file
+ *
  *  This file contains the definitions of the `MatImage` class.
  *
  *  The `MatImage` class was declared in `MatImage.h`.
@@ -244,8 +245,12 @@ void MatImage::set_key(const string& key)
 
         for (int px = 0; px < 3; ++px, ++mit) {
             for (int color = 0; color < 3; ++color, ++i) {
-                if (i != ignore)
-                    setbit( (*mit)[color], getbit(c, b++) );
+                if (i != ignore) {
+                    int s = static_cast<uint>(*(kit++)) % 2;
+                    if (kit == key.end()) kit = key.begin();
+
+                    setbit( (*mit)[color], getbit(c, b++), s);
+                }
             }
         }
     }
@@ -279,7 +284,10 @@ void MatImage::conceal(const string& text, const string& key)
         for (int px = 0; px < 3; ++px, ++mit) {
             for (int color = 0; color < 3; ++color, ++i) {
                 if (i != ignore) {
-                    setbit( (*mit)[color], getbit(c, b++) );
+                    int s = static_cast<uint>(*(kit++)) % 2;
+                    if (kit == key.end()) kit = key.begin();
+
+                    setbit( (*mit)[color], getbit(c, b++), s);
                 }
             }
         }
@@ -304,8 +312,12 @@ string MatImage::reveal(const string& key) const
 
         for (int px = 0; px < 3; ++px, ++mit) {
             for (int color = 0; color < 3; ++color, ++i) {
-                if (i != ignore)
-                    setbit( c, getbit((*mit)[color]), b++);
+                if (i != ignore) {
+                    int s = static_cast<uint>(*(kit++)) % 2;
+                    if (kit == key.end()) kit = key.begin();
+
+                    setbit( c, getbit((*mit)[color], s), b++);
+                }
             }
         }
 
@@ -337,8 +349,12 @@ string MatImage::hash(const string& key) const
 
             // Iterator over 3 colors for each pixel
             for (int color = 0; color < 3; ++color, ++i) {
-                if (i != ignore)
-                    setbit( c, getbit((*mit)[color]), b++ );
+                if (i != ignore) {
+                    int s = static_cast<uint>(*(kit++)) % 2;
+                    if (kit == key.end()) kit = key.begin();
+
+                    setbit( c, getbit((*mit)[color], s), b++ );
+                }
             }
         }
 
