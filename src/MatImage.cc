@@ -271,7 +271,6 @@ void MatImage::conceal(const string& text, const string& key)
         // Get ignore bits
         int ignore = static_cast<uint>(*(kit++)) % 8;
         if (kit == key.end()) kit = key.begin();
-        cout << ignore << endl;
 
         // Set bits
         uchar c = static_cast<uchar>(*tit);
