@@ -16,7 +16,7 @@ const Glib::ustring PROGRAM_TITLE =
 
 /** Current version of the program */
 const Glib::ustring PROGRAM_VERSION =
-    "0.4";
+    "0.5";
 
 /** Array of project team members */
 const Glib::ustring _a[3] = {
