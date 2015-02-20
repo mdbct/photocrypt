@@ -23,6 +23,7 @@ using Gdk::Pixbuf;
 // Default constructor for our main window
 Win::Win() :
     mLabelKey("Enter password"),
+    mLabelKeyConfirm("Confirm password"),
     mLabelImage("Select an image"),
     mLabelText("Write message or open a file"),
     mSized(false),
@@ -154,6 +155,7 @@ Win::Win() :
     mVBoxText.pack_start(mHBoxText, PACK_SHRINK);
     mVBoxText.pack_start(mScrolledWindowText);
     mVBoxText.pack_start(mHBoxKey, PACK_SHRINK);
+    mVBoxText.pack_start(mHBoxKeyConfirm, PACK_SHRINK);
     mVBoxText.pack_start(mHSep, PACK_SHRINK);
     mVBoxText.pack_start(mHBoxSave, PACK_SHRINK);
 
@@ -170,6 +172,11 @@ Win::Win() :
     mHBoxKey.set_spacing(10);
     mHBoxKey.pack_start(mLabelKey, PACK_SHRINK);
     mHBoxKey.pack_start(mEntryKey);
+
+    // Fill mHBoxKeyConfirm
+    mHBoxKeyConfirm.set_spacing(10);
+    mHBoxKeyConfirm.pack_start(mLabelKeyConfirm, PACK_SHRINK);
+    mHBoxKeyConfirm.pack_start(mEntryKeyConfirm);
 
     // Fill mHBoxSave
     mHBoxSave.set_spacing(10);
@@ -188,7 +195,10 @@ Win::Win() :
 
     mScrolledWindowText.set_policy(POLICY_AUTOMATIC, POLICY_AUTOMATIC);
 
+    mLabelKey.set_size_request(150, -1);
+    mLabelKeyConfirm.set_size_request(150, -1);
     mEntryKey.set_visibility(false);
+    mEntryKeyConfirm.set_visibility(false);
 
     mButtonSteg.set_can_default();
     mButtonSteg.grab_default();
@@ -307,6 +317,9 @@ void Win::onModeSteg()
     mButtonOpenText.set_sensitive(true);
     mTextView.set_sensitive(true);
     mEntryKey.set_text("");
+    mEntryKeyConfirm.set_text("");
+    mLabelKeyConfirm.show();
+    mEntryKeyConfirm.show();
 }
 
 void Win::onModeUnsteg()
@@ -321,10 +334,20 @@ void Win::onModeUnsteg()
     mButtonSave.set_sensitive(false);
     mButtonOpenText.set_sensitive(false);
     mEntryKey.set_text("");
+    mLabelKeyConfirm.hide();
+    mEntryKeyConfirm.hide();
 }
 
 void Win::steg()
 {
+    ustring key = mEntryKey.get_text();
+    ustring key_confirm = mEntryKeyConfirm.get_text();
+
+    if (key != key_confirm) {
+        display_error("The passwords do not match");
+        return;
+    }
+
     try
     {
         mMatImage.steg((mrTextBuffer->get_text()).raw(), mEntryKey.get_text().raw());
@@ -362,8 +385,8 @@ void Win::steg()
 
     if (d.run() == RESPONSE_OK) {
         mMatImage.save(d.get_filename().raw());
-        mStatusbar.pop();
-        mStatusbar.push("Stego-image written successfully.");
+        display_error("Successfully saved");
+        mrTextBuffer->set_text("");
         mEntryKey.set_text("");
     }
 }

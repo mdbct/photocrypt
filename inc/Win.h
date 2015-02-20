@@ -92,6 +92,7 @@ protected:
     Gtk::TextView       mTextView;
     Glib::RefPtr<Gtk::TextBuffer> mrTextBuffer;
     Gtk::HBox           mHBoxKey;
+    Gtk::HBox           mHBoxKeyConfirm;
     Gtk::HSeparator     mHSep;
     Gtk::HBox           mHBoxSave;
 
@@ -100,6 +101,8 @@ protected:
 
     Gtk::Label mLabelKey;
     Gtk::Entry mEntryKey;
+    Gtk::Label mLabelKeyConfirm;
+    Gtk::Entry mEntryKeyConfirm;
 
     Gtk::Button mButtonSteg;
     Gtk::Button mButtonSave;
