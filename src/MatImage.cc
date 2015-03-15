@@ -274,7 +274,7 @@ void MatImage::conceal(const string& text, const string& key)
     for (auto tit = txt.begin(); tit != txt.end(); ++tit) {
 
         // Get ignore bits
-        int ignore = static_cast<uint>(*(kit++)) % 8;
+        int ignore = static_cast<uint>(*(kit++)) % 9;
         if (kit == key.end()) kit = key.begin();
 
         // Set bits
@@ -303,7 +303,7 @@ string MatImage::reveal(const string& key) const
     for (auto mit = mMat.begin<Vec3b>() + cols(); ;) {
 
         // Get ignore bits
-        int ignore = static_cast<uint>(*(kit++)) % 8;
+        int ignore = static_cast<uint>(*(kit++)) % 9;
         if (kit == key.end()) kit = key.begin();
 
         // Set bits
