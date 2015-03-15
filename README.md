@@ -1,14 +1,15 @@
 # Photocrypt
 
 A [steganography][wiki-steganography] program that hides text in image. It has
-both a graphical ([gtkmm][gtkmm]) and a command-line interface. It is written
-in C++.
+both a graphical ([gtkmm][gtkmm]) and a command-line interface. It is a
+cross-platform application written in C++.
 
-It implements the Least Significant Bit (LSB) algorithm with password
-protection. Every bit of secret data is stored in the LSBs of the image pixel
-values. This makes the stego-image practically identical to the
-original image. The algorithm depends on the key so it is unfeasible to extract
-data without the key.
+It implements a modified LSB (least significant bit) substitution algorithm
+with password protection. Every bit of secret data is stored in the *less*
+significant bits (not always *least*) of the image pixel color values. This
+makes the stego-image practically identical to the original image. The
+algorithm depends on the key so it is unfeasible to extract data without the
+key.
 
 The algorithm used in this program can be explained briefly as:
 
@@ -17,8 +18,8 @@ The algorithm used in this program can be explained briefly as:
   password-verification feature.
 
 * The secret data starts from the beginning of the 2nd row. The bits used to
-  hide the data depends on the key itself. The value `\0` is appened at last to
-  mark the end of text.
+  hide the data depends on the key itself. The `\0` character is appended at
+  last to mark the end of text.
 
 <blockquote>
 <strong>Note:</strong> You cannot extract text from a JPEG image because the
@@ -63,7 +64,7 @@ To list available make targets:
 
 ## Usage
 
-To open the GUI frontend, run:
+To open the GUI front-end, run:
 
     photocrypt
 
