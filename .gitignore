@@ -39,3 +39,6 @@ doc/
 *.bmp
 *.gif
 !icon.png
+
+# Vim files
+.clang_complete

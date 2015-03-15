@@ -253,7 +253,6 @@ void Win::onOpenImage()
     filterImage.add_mime_type("image/bmp");
     filterImage.add_mime_type("image/png");
     filterImage.add_mime_type("image/jpeg");
-    filterImage.add_mime_type("image/gif");
 
     d.add_filter(filterImage);
 
