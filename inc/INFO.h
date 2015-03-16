@@ -1,4 +1,5 @@
 /** @file
+ *
  *  Some global informations about the program.
  */
 #ifndef INFO_H
@@ -16,7 +17,7 @@ const Glib::ustring PROGRAM_TITLE =
 
 /** Current version of the program */
 const Glib::ustring PROGRAM_VERSION =
-    "0.5";
+    "0.6";
 
 /** Array of project team members */
 const Glib::ustring _a[3] = {

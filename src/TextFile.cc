@@ -1,4 +1,5 @@
 /** @file
+ *
  *  This file contains the definition of the `TextFile` class which was
  *  declared in `TextFile.h` file.
  */

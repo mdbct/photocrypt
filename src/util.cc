@@ -16,7 +16,7 @@ using uchar = unsigned char;
 namespace Photocrypt
 {
 
-// Returns a SHA1 digest of the given string.
+// Returns a SHA1 digest of the given string
 string sha(const string& in)
 {
     uchar temp[SHA_DIGEST_LENGTH]; // SHA_DIGEST_LENGTH = 20 bytes
@@ -29,34 +29,20 @@ string sha(const string& in)
     for (int i = 0; i < SHA_DIGEST_LENGTH; ++i)
         s.push_back(temp[i]);
     return s;
-    /*
-    // We'll be writing the output string to a stringstream;
-    ostringstream o;
-
-    // Convert every byte into HEX string and add to o.
-    for (int i = 0; i < SHA_DIGEST_LENGTH; ++i)
-    {
-        // If the string is single digit, add a "0" before it.
-        if (temp[i] <= 0xF)
-            o << "0";
-
-        o << hex << static_cast<int>(temp[i]);
-    }
-
-    return o.str();
-    */
 }
 
 
-// Sets a bit.
+// Sets a bit
 void setbit(uchar& p, const int bit, const int index)
 {
+    // Check for pre-conditions
     if (bit < 0 or bit > 1)
         throw out_of_range("Bit should be either 0 or 1");
 
     if (index < 0 or index > 7)
         throw out_of_range("Index is out of range while setting bit");
 
+    // Set the bit
     switch (bit)
     {
     case 1:
@@ -72,9 +58,10 @@ void setbit(uchar& p, const int bit, const int index)
     }
 }
 
-// Get a bit.
+// Get a bit
 int getbit(const uchar& p, const int index)
 {
+    // Check for pre-conditions
     if (index < 0 or index > 7)
         throw out_of_range("Index is out of range while getting bit");
 

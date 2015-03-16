@@ -1,4 +1,5 @@
 /** @file
+ *
  *  This file contains the decaration for the `Win` class which is
  *  the main window for our pgoram.
  */
@@ -18,6 +19,7 @@ public:
 
     /** Creates the window and all its childs */
     Win();
+
     /** Destructor, does nothing */
     virtual ~Win();
 
@@ -26,41 +28,61 @@ protected:
 
     /** Displays the AboutDialog */
     virtual void onActionAbout();
+
     /** Displays a simple MessageDialog */
     virtual void onAction(const std::string msg);
+
     /** Displays a FileChooserDialog to open an image */
     virtual void onOpenImage();
+
     /** Clears the image in the view */
     virtual void onClearImage();
+
     /** Displays a FileChooserDialog to open a text file */
     virtual void onOpenText();
+
     /** Closes window */
     virtual void close() { hide(); }
+
     /** Handler for image resize */
     virtual void onImageResize(Gtk::Allocation& a);
+
     /** On TextBuffer change */
     virtual void onTextBufferChange();
+
     /** Select steg-mode */
     virtual void onModeSteg();
+
     /** Select unsteg-mode */
     virtual void onModeUnsteg();
+
     /** Steg */
     virtual void steg();
+
     /** Unsteg */
     virtual void unsteg();
+
     /** Save text file */
     virtual void save();
 
+
+
     /** Cut */
     virtual void onActionCut();
+
     /** Copy */
     virtual void onActionCopy();
+
     /** Paste */
     virtual void onActionPaste();
+
     /** Paste handler */
     virtual void onClipboardTextRecieved(const Glib::ustring& text);
+
     /** Displays a error dialog */
     virtual void display_error(const std::string& msg = "Error.");
+
+
 
     // Member widgets
 

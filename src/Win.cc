@@ -1,4 +1,5 @@
 /** @file
+ *
  *  This file defines the `Win` class
  */
 #include "Win.h"
@@ -188,11 +189,13 @@ Win::Win() :
     mButtonOpenImage.signal_clicked().connect(mem_fun(*this, &Win::onOpenImage));
     mButtonClearImage.signal_clicked().connect(mem_fun(*this, &Win::onClearImage));
 
+    // Resize the image to fit the window
     mImage.signal_size_allocate().connect(mem_fun(*this, &Win::onImageResize));
 
     // Widgets in the right side
     mButtonOpenText.signal_clicked().connect(mem_fun(*this, &Win::onOpenText));
 
+    // Show scroll bar only when needed
     mScrolledWindowText.set_policy(POLICY_AUTOMATIC, POLICY_AUTOMATIC);
 
     mLabelKey.set_size_request(150, -1);
@@ -211,9 +214,14 @@ Win::Win() :
 
 
 // Destructor
-Win::~Win() {}
+Win::~Win()
+{
+    // All our members are deallocated automatically.
+    //
+    // We don't need to do anything here. :)
+}
 
-
+// About
 void Win::onActionAbout()
 {
     AboutDialog d;
@@ -232,6 +240,7 @@ void Win::onActionAbout()
     d.run();
 }
 
+// Arbitrary action
 void Win::onAction(const string msg)
 {
     MessageDialog d(msg);
@@ -240,6 +249,7 @@ void Win::onAction(const string msg)
     d.run();
 }
 
+// Open an image
 void Win::onOpenImage()
 {
     // Create a FileChooseDialog with CANCEL & OK buttons
@@ -253,7 +263,6 @@ void Win::onOpenImage()
     filterImage.add_mime_type("image/bmp");
     filterImage.add_mime_type("image/png");
     filterImage.add_mime_type("image/jpeg");
-
     d.add_filter(filterImage);
 
     if (d.run() == RESPONSE_OK)
@@ -266,6 +275,7 @@ void Win::onOpenImage()
     }
 }
 
+// Clear the image
 void Win::onClearImage()
 {
     mMatImage = MatImage();
@@ -273,12 +283,15 @@ void Win::onClearImage()
     mLabelImage.set_label("Select an image");
 }
 
+// Open a text file
 void Win::onOpenText()
 {
+    // Create a file chooser dialog
     FileChooserDialog d(*this, "Select a text file");
     d.add_button(Stock::CANCEL, RESPONSE_CANCEL);
     d.add_button(Stock::OPEN, RESPONSE_OK);
 
+    // Add filter to select text files only
     FileFilter filterText;
     filterText.set_name("ASCII Text Files");
     filterText.add_mime_type("text/plain");
@@ -292,6 +305,7 @@ void Win::onOpenText()
     }
 }
 
+// Image is resized
 void Win::onImageResize(Allocation& a)
 {
     if (mMatImage.empty())
@@ -305,6 +319,7 @@ void Win::onImageResize(Allocation& a)
     }
 }
 
+// Steg mode
 void Win::onModeSteg()
 {
     mButtonSteg.set_label("Steg");
@@ -321,6 +336,7 @@ void Win::onModeSteg()
     mEntryKeyConfirm.show();
 }
 
+// Unsteg mode
 void Win::onModeUnsteg()
 {
     mButtonSteg.set_label("Unsteg");
@@ -337,8 +353,10 @@ void Win::onModeUnsteg()
     mEntryKeyConfirm.hide();
 }
 
+// Steg
 void Win::steg()
 {
+    // Check for password validity
     ustring key = mEntryKey.get_text();
     ustring key_confirm = mEntryKeyConfirm.get_text();
 
@@ -347,31 +365,25 @@ void Win::steg()
         return;
     }
 
-    try
-    {
+
+    // Try to steg it
+    try {
         mMatImage.steg((mrTextBuffer->get_text()).raw(), mEntryKey.get_text().raw());
-    }
-    catch (ImageEmptyError)
-    {
+    } catch (ImageEmptyError) {
         display_error("Select an image first.");
         return;
-    }
-    catch (TextEmptyError)
-    {
+    } catch (TextEmptyError) {
         display_error("There is no text to hide.");
         return;
-    }
-    catch (KeyEmptyError)
-    {
+    } catch (KeyEmptyError) {
         display_error("You must set a password.");
         return;
-    }
-    catch (InsufficientImageError)
-    {
+    } catch (InsufficientImageError) {
         display_error("The image is not large enough.");
         return;
     }
 
+    // If stegging is successful, then ask to save it
     FileChooserDialog d(*this, "Save stego image as...", FILE_CHOOSER_ACTION_SAVE);
     d.add_button(Stock::CANCEL, RESPONSE_CANCEL);
     d.add_button(Stock::SAVE, RESPONSE_OK);
@@ -390,29 +402,26 @@ void Win::steg()
     }
 }
 
+// Unsteg
 void Win::unsteg()
 {
     string text;
-    try 
-    {
+
+    // Try to unsteg the text
+    try {
         text = mMatImage.unsteg(mEntryKey.get_text().raw());
-    }
-    catch (ImageEmptyError)
-    {
+    } catch (ImageEmptyError) {
         display_error("Select an image first.");
         return;
-    }
-    catch (KeyEmptyError)
-    {
+    } catch (KeyEmptyError) {
         display_error("You must enter a password.");
         return;
-    }
-    catch (KeyMismatchError)
-    {
+    } catch (KeyMismatchError) {
         display_error("Incorrect password.");
         return;
     }
 
+    // If successful, display it
     mrTextBuffer -> set_text(text);
     mTextView.set_sensitive();
     mButtonSave.set_sensitive();
@@ -420,13 +429,16 @@ void Win::unsteg()
     mStatusbar.push("Secret text successfully extracted.");
 }
 
+// Text buffer is changed
 void Win::onTextBufferChange()
 {
+    // Update the size of text in the label
     int size = (mrTextBuffer -> get_text()).size();
     string label = "Size: " + to_string(size) + " Bytes";
     mLabelText.set_label(label);
 }
 
+// Save the text
 void Win::save()
 {
     FileChooserDialog d(*this, "Save text as...", FILE_CHOOSER_ACTION_SAVE);
@@ -449,12 +461,14 @@ void Win::save()
     }
 }
 
+// Cut
 void Win::onActionCut()
 {
     onActionCopy();
     mrTextBuffer -> erase_selection(false);
 }
 
+// Copy
 void Win::onActionCopy()
 {
     TextBuffer::iterator start, end;
@@ -464,16 +478,19 @@ void Win::onActionCopy()
     }
 }
 
+// Paste
 void Win::onActionPaste()
 {
     mrClipboard -> request_text(mem_fun(*this, &Win::onClipboardTextRecieved));
 }
 
+// Paste handler
 void Win::onClipboardTextRecieved(const ustring& text)
 {
     mrTextBuffer -> insert_at_cursor(text);
 }
 
+// Display a error message box
 void Win::display_error(const string& msg)
 {
     MessageDialog(*this, msg, MESSAGE_ERROR).run();

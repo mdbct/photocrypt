@@ -80,6 +80,11 @@ Similarly, to decrypt the text hidden in `stego.png`:
 
 For more info, see `steg -h` and `unsteg -h`.
 
+## Authors
+
+* Manish Munikar, `070-BCT-520`
+* Dipesh Pandey, `070-BCT-514`
+* Brihat Ratna Bajracharya, `070-BCT-513`
 
 [wiki-steganography]: http://en.wikipedia.org/wiki/Steganography
 [gtkmm]:              http://gtkmm.org

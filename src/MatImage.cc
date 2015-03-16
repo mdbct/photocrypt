@@ -22,27 +22,37 @@ using uint = unsigned int;
 namespace Photocrypt
 {
 
+/*
 // Default constructor
 MatImage::MatImage()
 {
 }
+*/
 
 // Open an image file
 MatImage::MatImage(const string& filename)
 {
+    // Load the image from the given filename
     mMat = imread(filename, CV_LOAD_IMAGE_COLOR);
 
+    // If something goes wrong
     if (not mMat.data)
         throw IOError("Couldn't open image file");
 
+    // Convert the image from BGR to RGB.
+    //
+    // This is required because OpenCV loads image as BGR and gtk requires
+    // the image in RGB to display correctly.
     cvtColor(mMat, mMat, CV_BGR2RGB);
 }
 
 // Create from Pixbuf
 MatImage::MatImage(const RefPtr<Pixbuf>& p)
 {
+    // Copy the Pixbuf
     RefPtr<Pixbuf> pp = p->copy();
 
+    // Convert into cv::Mat
     mMat = Mat(
             Size(pp->get_width(), pp->get_height()), // Dimensions
             CV_8UC3,                                 // Type
@@ -65,6 +75,10 @@ MatImage::MatImage(const MatImage& image)
 // Destructor
 MatImage::~MatImage()
 {
+    // We don't need to do anything here.
+    //
+    // That's because our only member data is a cv::Mat object.
+    // And the destructor of cv::Mat will do the neccesary cleanups.
 }
 
 //==========
@@ -80,7 +94,8 @@ void MatImage::save(const string& filename) const
 }
 
 
-// Getters
+// Constant getters
+
 long MatImage::cols() const
 {
     return mMat.cols;
@@ -139,28 +154,36 @@ RefPtr<Pixbuf> MatImage::pixbuf() const
 // Scale the image to given width and height
 RefPtr<Pixbuf> MatImage::scale(int width, int height) const
 {
+    // Both parameter can't be zero
     if (width <= 0 and height <= 0)
         throw invalid_argument("Both arguments can't be zero simultaneously.");
 
+    // Get the aspect ratio of the original image
     double ratio = static_cast<double>(cols()) / rows();
 
+    // If either height or width is 0, then adjust it to maintain ratio
     if (width <= 0)
         width = height * ratio;
     else if (height <= 0)
         height = width / ratio;
 
+    // Scale the image
     return this->pixbuf()->scale_simple(width, height, Gdk::INTERP_BILINEAR);
 }
 
 // Returns a scaled image that fits within given dimenstion
 RefPtr<Pixbuf> MatImage::fit(int width, int height) const
 {
-    if (width <= 0 or height <= 0)
+    // the width or height cannot be less than 1
+    if (width < 1 or height < 1)
         throw invalid_argument("Both arguments should be greater than zero");
 
+    // Get the ratio of window
     double win_ratio = static_cast<double>(width) / height;
+    // Get the ratio of image
     double img_ratio = static_cast<double>(cols()) / rows();
 
+    // Fit it
     if (win_ratio > img_ratio)
         return this -> scale(0, height);
     else
@@ -170,8 +193,13 @@ RefPtr<Pixbuf> MatImage::fit(int width, int height) const
 // Display an image using OpenCV
 void  MatImage::show(int msecs) const
 {
+    // Create a window
     namedWindow("MatImage", CV_WINDOW_NORMAL);
+
+    // Display the image in that window
     imshow("MatImage", mMat);
+
+    // Wait
     waitKey(msecs);
 }
 
@@ -179,6 +207,7 @@ void  MatImage::show(int msecs) const
 // Steg
 MatImage& MatImage::steg(const string& text, const string& key)
 {
+    // Check for pre-conditions
     if (empty())
         throw ImageEmptyError();
 
@@ -194,7 +223,12 @@ MatImage& MatImage::steg(const string& text, const string& key)
     if (text.size() >= max())
         throw InsufficientImageError("Text is too large for this image");
 
+    // If everything is valid, then steg it
+
+    // First steg the key
     set_key(key);
+
+    // Then steg the text
     conceal(text, key);
 
     return (*this);
@@ -203,6 +237,7 @@ MatImage& MatImage::steg(const string& text, const string& key)
 // Unsteg
 string MatImage::unsteg(const string& key) const
 {
+    // Check for pre-conditions
     assert(sha(key).size() == 20);
 
     if (empty())
@@ -214,6 +249,7 @@ string MatImage::unsteg(const string& key) const
     if (sha(key) != hash(key))
         throw KeyMismatchError();
 
+    // Decrypt the text and return it
     return reveal(key);
 }
 
@@ -223,19 +259,24 @@ string MatImage::unsteg(const string& key) const
 // Set a key for the image
 void MatImage::set_key(const string& key)
 {
+    // Password should not be empty
     if (key.empty())
         throw KeyEmptyError("Key is empty");
 
+    // We'll store the SHA1 digest of the key (not the key itself) in the image.
     string hash = sha(key);
     assert(hash.size() == 20);
-    hash.push_back(0);
 
+    // Key will be used to choose the store bits and ignore color
     auto kit = key.begin();
 
+    // The key (it's hash) will be written in the first row of image
     auto mit = mMat.begin<Vec3b>();
+
+    // For every character (or byte) of hash
     for (auto hit = hash.begin(); hit != hash.end(); ++hit)
     {
-        // Get ignore bit
+        // Get the color to ignore
         int ignore = static_cast<uint>(*(kit++)) % 8;
         if (kit == key.end()) kit = key.begin();
 
@@ -243,8 +284,13 @@ void MatImage::set_key(const string& key)
         uchar c = static_cast<uchar>(*hit);
         int i = 0, b = 0;
 
+        // Iterate over 3 pixels for each byte
         for (int px = 0; px < 3; ++px, ++mit) {
+
+            // Iterate over 3 colors for each pixel
             for (int color = 0; color < 3; ++color, ++i) {
+
+                // Don't use the ignore color
                 if (i != ignore) {
                     int s = static_cast<uint>(*(kit++)) % 2;
                     if (kit == key.end()) kit = key.begin();
@@ -259,21 +305,27 @@ void MatImage::set_key(const string& key)
 // Conceal
 void MatImage::conceal(const string& text, const string& key)
 {
+    // Check for pre-conditions
     if (text.empty())
         throw TextEmptyError();
 
     if (key.empty())
         throw KeyEmptyError();
 
+    // The text will be written starting from the 2nd row of the image
     auto mit = mMat.begin<Vec3b>() + cols();
+
+    // Add '\0' to the text as an indicator for end of text while decrypting
     auto txt = text;
     txt.push_back(0);
 
+    // Key will be used to choose store bits and ignore color
     auto kit = key.begin();
 
+    // For each character (of byte) of text
     for (auto tit = txt.begin(); tit != txt.end(); ++tit) {
 
-        // Get ignore bits
+        // Get the ignore bit
         int ignore = static_cast<uint>(*(kit++)) % 9;
         if (kit == key.end()) kit = key.begin();
 
@@ -281,8 +333,13 @@ void MatImage::conceal(const string& text, const string& key)
         uchar c = static_cast<uchar>(*tit);
         int i = 0, b = 0;
 
+        // 3 pixels for each byte
         for (int px = 0; px < 3; ++px, ++mit) {
+
+            // 3 colors for each pixel
             for (int color = 0; color < 3; ++color, ++i) {
+
+                // Don't use the ignore color
                 if (i != ignore) {
                     int s = static_cast<uint>(*(kit++)) % 2;
                     if (kit == key.end()) kit = key.begin();
@@ -298,11 +355,14 @@ void MatImage::conceal(const string& text, const string& key)
 string MatImage::reveal(const string& key) const
 {
     string text;
+
+    // Key will be used to choose store bits and ignore color
     auto kit = key.begin();
 
+    // Start iterating the pixels from the 2nd row
     for (auto mit = mMat.begin<Vec3b>() + cols(); ;) {
 
-        // Get ignore bits
+        // Get the ignore color
         int ignore = static_cast<uint>(*(kit++)) % 9;
         if (kit == key.end()) kit = key.begin();
 
@@ -310,17 +370,25 @@ string MatImage::reveal(const string& key) const
         uchar c;
         int b = 0, i = 0;
 
+        // 3 pixels for each byte
         for (int px = 0; px < 3; ++px, ++mit) {
+
+            // 3 colors for each pixel
             for (int color = 0; color < 3; ++color, ++i) {
+
+                // Don't use the ignore color
                 if (i != ignore) {
+                    // Get the store bit
                     int s = static_cast<uint>(*(kit++)) % 2;
                     if (kit == key.end()) kit = key.begin();
 
+                    // Get the bit from the color
                     setbit( c, getbit((*mit)[color], s), b++);
                 }
             }
         }
 
+        // After getting each byte, check if it is the end of text
         if (c == 0) break;
         text.push_back(c);
     }
@@ -332,11 +400,17 @@ string MatImage::reveal(const string& key) const
 string MatImage::hash(const string& key) const
 {
     string hash;
+
+    // Key will be used to choose store bits and ignore color
     auto kit = key.begin();
 
-    for (auto mit = mMat.begin<Vec3b>(); ;) {
+    // Start iterating the pixels from 1st row
+    auto mit = mMat.begin<Vec3b>();
 
-        // Get ignore bits
+    // The hash is 20 bytes long
+    for (int size = 0; size < 20; ++size) {
+
+        // Get the ignore color
         int ignore = static_cast<uint>(*(kit++)) % 8;
         if (kit == key.end()) kit = key.begin();
 
@@ -344,21 +418,25 @@ string MatImage::hash(const string& key) const
         uchar c;
         int b = 0, i = 0;
 
-        // Iterate over 3 pixels for each byte
+        // 3 pixels for each byte
         for (int px = 0; px < 3; ++px, ++mit) {
 
-            // Iterator over 3 colors for each pixel
+            // 3 colors for each pixel
             for (int color = 0; color < 3; ++color, ++i) {
+
+                // Don't use the ignore color
                 if (i != ignore) {
+
+                    // Get the store bit
                     int s = static_cast<uint>(*(kit++)) % 2;
                     if (kit == key.end()) kit = key.begin();
 
+                    // Get the bit from the color
                     setbit( c, getbit((*mit)[color], s), b++ );
                 }
             }
         }
 
-        if (c == 0) break;
         hash.push_back(c);
     }
 

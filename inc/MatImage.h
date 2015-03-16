@@ -1,4 +1,5 @@
 /** @file
+ *
  *  This file contains the declaration of the `MatImage` class that represents
  *  an image.
  *
@@ -23,7 +24,7 @@ class MatImage
 {
 public:
     /** Creates an empty image with nothing */
-    MatImage();
+    MatImage() = default;
 
     /** Creates an `MatImage` object from an image file */
     MatImage(const std::string& filename);

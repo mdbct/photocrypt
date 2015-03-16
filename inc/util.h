@@ -1,4 +1,5 @@
 /** @file
+ *
  *  This file contains the decarations of the useful utility functions
  */
 #ifndef UTIL_H
@@ -10,7 +11,9 @@
 namespace Photocrypt
 {
 
-/** Returns the SHA1-hashed string of the given string
+/** Returns the SHA1-hashed string of the given string.
+ *
+ * The return string is always 20 bytes long.
  *
  * @param   in  The string to be hashed
  *
@@ -36,6 +39,6 @@ void setbit(unsigned char& p, const int bit, const int index = 0);
  */
 int  getbit(const unsigned char& p, const int index = 0);
 
-} // namespace util
+} // namespace Photocrypt
 
 #endif // UTIL_H

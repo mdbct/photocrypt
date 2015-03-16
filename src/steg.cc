@@ -29,7 +29,7 @@ int main(int argc, char** argv)
     string key;
     string stego_filename = "out.png";
 
-    // Parse command-line options
+    // Command line options
     int option_index = 0;
     option long_options[] = {
         {"help",      no_argument,       0, 'h'},
@@ -40,9 +40,11 @@ int main(int argc, char** argv)
         {0,0,0,0}
     };
 
+    // Parse every option
     while (true) {
         int c = getopt_long(argc, argv, ":hVf:p:o:", long_options, &option_index);
 
+        // If parsing is complete, break out of loop
         if (c == -1) break;
 
         switch (c) {
@@ -66,17 +68,18 @@ int main(int argc, char** argv)
                 stego_filename = string(optarg);
                 break;
 
-            case ':':
+            case ':': // Missing argument
                 error("Missing option argument");
 
-            case '?':
+            case '?': // Unknown option
                 error("Unknown option");
 
-            default:
+            default:  // Unknown error
                 error("Unknown error");
         }
     }
 
+    // There should be exactly 1 non-option argument
     if ( (argc - optind) != 1 ) {
         print_help();
         return 1;

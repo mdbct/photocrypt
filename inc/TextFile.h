@@ -1,4 +1,5 @@
 /** @file
+ *
  *  This file declares a class that represents a text file buffer.
  */
 #ifndef TEXTFILE_H

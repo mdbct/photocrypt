@@ -28,7 +28,7 @@ int main(int argc, char** argv)
     string key;
     string out_filename;
 
-    // Parse command-line options
+    // Command-line options
     int option_index = 0;
     option long_options[] = {
         {"help",      no_argument,       0, 'h'},
@@ -38,9 +38,11 @@ int main(int argc, char** argv)
         {0,0,0,0}
     };
 
+    // Parse every options
     while (true) {
         int c = getopt_long(argc, argv, ":hVp:o:", long_options, &option_index);
 
+        // If parsing complete, break out of loop
         if (c == -1) break;
 
         switch (c) {
@@ -71,6 +73,7 @@ int main(int argc, char** argv)
         }
     }
 
+    // There should be exactly 1 non-option argument
     if ( (argc - optind) != 1 ) {
         print_help();
         return 1;
@@ -79,12 +82,9 @@ int main(int argc, char** argv)
     // Open the image
     image_filename = string(argv[optind++]);
     MatImage I;
-    try
-    {
+    try {
         I = image_filename;
-    }
-    catch (const IOError& e)
-    {
+    } catch (const IOError& e) {
         error(e);
     }
 
@@ -96,8 +96,7 @@ int main(int argc, char** argv)
 
     // Unsteg
     TextFile file;
-    try
-    {
+    try {
         file = I.unsteg(key);
 
         if (out_filename.empty()) {
@@ -106,9 +105,7 @@ int main(int argc, char** argv)
             file.save(out_filename);
             cout << ":: Hidden text extracted to '" << out_filename <<"'" << endl;
         }
-    }
-    catch (const exception& e)
-    {
+    } catch (const exception& e) {
         error(e);
     }
 

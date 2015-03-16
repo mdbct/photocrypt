@@ -1,4 +1,4 @@
-/** @file:
+/** @file
  *
  *  This file declares some exceptions used in this project.
  *
