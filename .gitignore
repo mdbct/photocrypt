@@ -32,6 +32,7 @@ photocrypt
 
 # Documentation
 doc/
+html/
 
 # Images
 *.png

@@ -75,7 +75,7 @@ uninstall:
 
 doc: $(HDIR)/* $(CDIR)/* README.md Doxyfile
 	@doxygen 1>/dev/null 2>&1
-	@echo ":: Documentation generated in \`doc\` directory."
+	@echo ":: Documentation generated."
 
 clean-doc:
 	@echo ":: Cleaning docs"
