@@ -22,12 +22,6 @@ using uint = unsigned int;
 namespace Photocrypt
 {
 
-/*
-// Default constructor
-MatImage::MatImage()
-{
-}
-*/
 
 // Open an image file
 MatImage::MatImage(const string& filename)
@@ -284,17 +278,19 @@ void MatImage::set_key(const string& key)
         uchar c = static_cast<uchar>(*hit);
         int i = 0, b = 0;
 
-        // Iterate over 3 pixels for each byte
+        // 3 pixels for each byte
         for (int px = 0; px < 3; ++px, ++mit) {
 
-            // Iterate over 3 colors for each pixel
+            // 3 colors for each pixel
             for (int color = 0; color < 3; ++color, ++i) {
 
                 // Don't use the ignore color
                 if (i != ignore) {
+                    // Get the store bit
                     int s = static_cast<uint>(*(kit++)) % 2;
                     if (kit == key.end()) kit = key.begin();
 
+                    // Store the bit
                     setbit( (*mit)[color], getbit(c, b++), s);
                 }
             }
@@ -341,9 +337,11 @@ void MatImage::conceal(const string& text, const string& key)
 
                 // Don't use the ignore color
                 if (i != ignore) {
+                    // Get the store bit
                     int s = static_cast<uint>(*(kit++)) % 2;
                     if (kit == key.end()) kit = key.begin();
 
+                    // Store the bit
                     setbit( (*mit)[color], getbit(c, b++), s);
                 }
             }

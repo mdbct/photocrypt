@@ -7,6 +7,7 @@
 HDIR      := inc
 ODIR      := obj
 CDIR      := src
+DOCDIR    := html
 DESTDIR   := 
 
 SOURCES   := MatImage.cc TextFile.cc util.cc Error.cc
@@ -79,16 +80,16 @@ doc: $(HDIR)/* $(CDIR)/* README.md Doxyfile
 
 clean-doc:
 	@echo ":: Cleaning docs"
-	@rm -rf doc
+	@rm -rf "$(DOCDIR)"
 
 help:
 	@echo "The Makefile defines the following target:"
-	@echo "   make            : Builds the GUI program"
-	@echo "   make cli        : Builds the CLI programs (steg & unsteg)"
-	@echo "   make gui        : Builds the GUI program (photocrypt)"
-	@echo "   make clean      : Cleans the built files"
-	@echo "   make install    : Installs the program into the system"
-	@echo "   make uninstall  : Uninstalls the program from the system"
-	@echo "   make doc        : Generates documentation in html"
-	@echo "   make help       : Displays this help text"
+	@echo "   make            : builds GUI and CLI programs"
+	@echo "   make cli        : builds the CLI programs (steg & unsteg)"
+	@echo "   make gui        : builds the GUI program (photocrypt)"
+	@echo "   make clean      : cleans the built files"
+	@echo "   make install    : installs the program into the system"
+	@echo "   make uninstall  : uninstalls the program from the system"
+	@echo "   make doc        : generates documentation in html"
+	@echo "   make help       : displays this help text"
 
